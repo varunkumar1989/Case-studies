@@ -22,3 +22,10 @@ Independent educational UX case study by Varun Kumar. Not affiliated with OYO.
 Open `index.html` in a browser. It uses sample data only. Any 10-digit number works at login and the demo OTP is `1234`.
 
 Prototype · not affiliated with OYO
+
+## PDFs
+
+| File | Pages |
+|---|---|
+| [`OYO_UX_Evaluation_v3_10_Pages.pdf`](./OYO_UX_Evaluation_v3_10_Pages.pdf) | 10 |
+| [`OYO_UX_Evaluation_v3_Detailed_Report.pdf`](./OYO_UX_Evaluation_v3_Detailed_Report.pdf) | 23 |
