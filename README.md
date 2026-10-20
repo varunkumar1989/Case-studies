@@ -1,4 +1,4 @@
-# Case studies
+# PM-Case-studies & Assignment
 
 Product and UX case studies by Varun Kumar. Independent educational work, not affiliated with any company named. Prototypes use sample data only.
 
