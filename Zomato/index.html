@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Food Delivery Prototype</title>
+<style>
+:root{
+  --brand:#d92d4b;--brand-d:#a81f38;--brand-l:#fde8ec;
+  --ink:#1c1b22;--mute:#6b6a76;--line:#e8e7ee;--bg:#f5f4f8;--card:#fff;
+  --ok:#14804a;--ok-l:#e2f5ea;--r:14px;
+}
+@media (prefers-color-scheme:dark){
+  :root{--ink:#f2f1f6;--mute:#a3a2b0;--line:#34333f;--bg:#15141b;--card:#201f28;--brand-l:#3a1822;--ok-l:#12301f}
+}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+body{font:15px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);background:var(--bg);min-height:100vh;display:flex;justify-content:center}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+#app{width:100%;max-width:430px;height:100vh;height:100dvh;background:var(--bg);position:relative;display:flex;flex-direction:column;overflow:hidden}
+@media(min-width:500px){body{padding:20px;background:#0001}#app{height:min(860px,calc(100vh - 40px));border-radius:28px;box-shadow:0 20px 60px #0004;border:1px solid var(--line)}}
+.tag{background:var(--ink);color:var(--bg);font-size:11px;text-align:center;padding:5px 8px;flex:none}
+.screen{flex:1;overflow-y:auto;display:none;flex-direction:column;animation:in .2s}
+.screen.on{display:flex}
+@keyframes in{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
+.top{display:flex;align-items:center;gap:10px;padding:14px 16px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.top h2{font-size:17px;flex:1}
+.back{width:36px;height:36px;border-radius:50%;background:var(--bg);font-size:18px}
+.pad{padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px}
+.btn{display:block;width:100%;background:var(--brand);color:#fff;font-weight:600;padding:14px;border-radius:12px;text-align:center}
+.btn:active{background:var(--brand-d)}
+.btn.ghost{background:var(--card);color:var(--brand);border:1px solid var(--brand)}
+.foot{position:sticky;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:var(--card);border-top:1px solid var(--line);margin-top:auto}
+label.f{display:block;font-size:12px;color:var(--mute);margin-bottom:4px}
+input.in{width:100%;padding:13px;border:1px solid var(--line);border-radius:12px;background:var(--card);outline:none}
+input.in:focus{border-color:var(--brand)}
+.mute{color:var(--mute);font-size:13px}
+.chip{display:inline-block;padding:6px 12px;border-radius:99px;border:1px solid var(--line);background:var(--card);font-size:13px;margin:0 6px 6px 0;cursor:pointer}
+.chip.on{background:var(--brand-l);border-color:var(--brand);color:var(--brand);font-weight:600}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.hero{background:linear-gradient(160deg,var(--brand),#6e1226);color:#fff;padding:36px 22px 28px}
+.hero h1{font-size:28px;line-height:1.15;margin:30px 0 8px}
+.logo{display:inline-block;background:#fff3;border-radius:10px;padding:6px 12px;font-weight:700;letter-spacing:.5px}
+.otp{display:flex;gap:10px;margin:10px 0}
+.otp input{text-align:center;font-size:22px;padding:12px 0}
+.img{border-radius:12px;background:var(--c,#ccc);display:flex;align-items:center;justify-content:center;font-size:34px;flex:none}
+.rest{display:flex;gap:12px;cursor:pointer}
+.rest .img{width:92px;height:92px}
+.rate{background:var(--ok);color:#fff;font-size:12px;font-weight:700;border-radius:6px;padding:2px 6px}
+.pill{font-size:11px;padding:2px 8px;border-radius:99px;background:var(--ok-l);color:var(--ok);font-weight:600}
+.veg,.nv{display:inline-block;width:14px;height:14px;border:2px solid var(--ok);border-radius:3px;position:relative;vertical-align:middle;margin-right:6px}
+.veg::after,.nv::after{content:"";position:absolute;inset:2px;border-radius:50%;background:var(--ok)}
+.nv{border-color:#b3261e}.nv::after{background:#b3261e}
+.qty{display:inline-flex;align-items:center;border:1px solid var(--brand);border-radius:10px;overflow:hidden;color:var(--brand);font-weight:700}
+.qty button{width:34px;height:34px;color:var(--brand);font-size:18px}
+.qty span{min-width:26px;text-align:center}
+.add{border:1px solid var(--brand);color:var(--brand);font-weight:700;border-radius:10px;padding:7px 22px;background:var(--card)}
+.bill .row{padding:5px 0}
+.bill .tot{border-top:1px dashed var(--line);margin-top:6px;padding-top:10px;font-weight:700;font-size:17px}
+.green{color:var(--ok)}
+.opt{display:flex;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:13px;margin-bottom:10px;background:var(--card);cursor:pointer;width:100%;text-align:left}
+.opt.on{border-color:var(--brand);background:var(--brand-l)}
+.dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);flex:none}
+.opt.on .dot{border:5px solid var(--brand)}
+.steps{list-style:none;padding:0}
+.steps li{display:flex;gap:12px;padding-bottom:18px;position:relative;color:var(--mute)}
+.steps li::before{content:"";position:absolute;left:11px;top:24px;bottom:0;width:2px;background:var(--line)}
+.steps li:last-child::before{display:none}
+.steps .b{width:24px;height:24px;border-radius:50%;background:var(--line);flex:none;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;z-index:1}
+.steps li.done{color:var(--ink)}.steps li.done .b{background:var(--ok)}.steps li.done::before{background:var(--ok)}
+.steps li.cur{color:var(--ink);font-weight:600}.steps li.cur .b{background:var(--brand);animation:pulse 1.2s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 7px var(--brand-l)}}
+.map{height:150px;border-radius:12px;background:#d8e8e0;overflow:hidden;margin-bottom:12px}
+@media(prefers-color-scheme:dark){.map{background:#243a31}}
+.map svg{width:100%;height:100%}
+.toast{position:absolute;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:99px;font-size:13px;opacity:0;pointer-events:none;transition:.25s;z-index:20;white-space:nowrap}
+.toast.on{opacity:1}
+.spin{width:44px;height:44px;border:4px solid var(--line);border-top-color:var(--brand);border-radius:50%;animation:sp .8s linear infinite;margin:0 auto 14px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.center{margin:auto;text-align:center;padding:30px}
+.err{color:#c0262d;font-size:12px;min-height:16px;margin-top:4px}
+.scroll-x{display:flex;overflow-x:auto;gap:8px;padding-bottom:4px}
+.scroll-x .chip{white-space:nowrap;margin:0}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="tag">Prototype · not affiliated with Zomato</div>
+
+  <section class="screen on" id="s-login">
+    <div class="hero"><span class="logo">FOODIE</span><h1>Hungry? Dinner in 30 minutes.</h1><p style="opacity:.85">Sign in to order from sample restaurants.</p></div>
+    <div class="pad" id="login-body"></div>
+    <div class="pad mute" style="margin-top:auto;text-align:center;font-size:12px">Sample data only. Any 10-digit number works; OTP is 1234.</div>
+  </section>
+
+  <section class="screen" id="s-search">
+    <div class="top" style="flex-direction:column;align-items:stretch;gap:8px">
+      <div class="row"><div><div class="mute">Deliver to</div><b>📍 Home · Indiranagar</b></div><button id="logout" class="mute">Log out</button></div>
+      <input class="in" id="q" placeholder="Search restaurants or dishes (try biryani, pizza)" autocomplete="off">
+      <div class="scroll-x" id="cuis"></div>
+      <div class="row"><label class="mute"><input type="checkbox" id="vegOnly"> Veg only</label><span class="mute" id="count"></span></div>
+    </div>
+    <div class="pad" id="rl"></div>
+  </section>
+
+  <section class="screen" id="s-menu">
+    <div class="top"><button class="back" data-go="search">←</button><div style="flex:1"><h2 id="mn"></h2><div class="mute" id="mi"></div></div></div>
+    <div class="pad" id="mb"></div>
+    <div class="foot" id="mfoot" style="display:none"><div class="row"><div><b id="mcount"></b><div class="mute" id="msum"></div></div><button class="btn" style="width:auto;padding:12px 22px" data-go="cart">View cart</button></div></div>
+  </section>
+
+  <section class="screen" id="s-cart">
+    <div class="top"><button class="back" data-go="menu">←</button><h2>Your cart</h2></div>
+    <div class="pad" id="cb"></div>
+    <div class="foot"><button class="btn" id="topay"></button></div>
+  </section>
+
+  <section class="screen" id="s-pay">
+    <div class="top"><button class="back" data-go="cart">←</button><h2>Payment</h2></div>
+    <div class="pad" id="pb"></div>
+    <div class="foot"><button class="btn" id="payBtn"></button></div>
+  </section>
+
+  <section class="screen" id="s-proc"><div class="center"><div class="spin"></div><b>Placing your order…</b><p class="mute">Please don't close this screen</p></div></section>
+
+  <section class="screen" id="s-track">
+    <div class="top"><h2>Order tracking</h2><span class="pill" id="tpill">Live</span></div>
+    <div class="pad" id="tb"></div>
+  </section>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const inr=n=>"₹"+Math.round(n).toLocaleString("en-IN");
+const RESTS=[
+ {id:1,name:"Biryani Junction",cuisine:"Biryani",emoji:"🍛",color:"#f9d9c5",rating:4.4,eta:30,km:2.1,offer:"20% off up to ₹100",
+  menu:[{id:"a",n:"Chicken Dum Biryani",p:279,v:0,d:"Slow-cooked basmati, raita"},{id:"b",n:"Paneer Biryani",p:239,v:1,d:"Smoky paneer, saffron rice"},{id:"c",n:"Mutton Biryani",p:369,v:0,d:"Tender mutton, boiled egg"},{id:"d",n:"Mirchi Ka Salan",p:79,v:1,d:"Peanut-sesame gravy"},{id:"e",n:"Gulab Jamun (2 pc)",p:69,v:1,d:"Warm, syrupy"}]},
+ {id:2,name:"Slice of Italy",cuisine:"Pizza",emoji:"🍕",color:"#f3e3b8",rating:4.2,eta:35,km:3.4,offer:"Free garlic bread over ₹499",
+  menu:[{id:"a",n:"Margherita Pizza",p:249,v:1,d:"Mozzarella, basil, tomato"},{id:"b",n:"Pepperoni Pizza",p:349,v:0,d:"Double pepperoni"},{id:"c",n:"Farmhouse Pizza",p:329,v:1,d:"Capsicum, olives, mushroom"},{id:"d",n:"Garlic Bread",p:129,v:1,d:"Cheesy, 4 pc"},{id:"e",n:"Tiramisu Cup",p:159,v:1,d:"Coffee-soaked sponge"}]},
+ {id:3,name:"Dosa Corner",cuisine:"South Indian",emoji:"🥞",color:"#cfe9d4",rating:4.6,eta:22,km:1.2,offer:"Flat ₹50 off",
+  menu:[{id:"a",n:"Masala Dosa",p:99,v:1,d:"Potato masala, chutneys"},{id:"b",n:"Idli Sambar (3 pc)",p:79,v:1,d:"Soft steamed idlis"},{id:"c",n:"Ghee Podi Dosa",p:129,v:1,d:"Spicy podi, ghee roast"},{id:"d",n:"Filter Coffee",p:49,v:1,d:"Strong decoction"}]},
+ {id:4,name:"Wok & Roll",cuisine:"Chinese",emoji:"🥡",color:"#d6dcf5",rating:4.0,eta:32,km:2.8,offer:"",
+  menu:[{id:"a",n:"Veg Hakka Noodles",p:179,v:1,d:"Wok-tossed"},{id:"b",n:"Chilli Chicken",p:249,v:0,d:"Dry, spicy"},{id:"c",n:"Veg Manchurian",p:199,v:1,d:"Gravy"},{id:"d",n:"Schezwan Fried Rice",p:189,v:1,d:"Fiery"}]},
+ {id:5,name:"Burger Barn",cuisine:"Burgers",emoji:"🍔",color:"#e2d4f0",rating:4.3,eta:28,km:1.9,offer:"Buy 1 get fries",
+  menu:[{id:"a",n:"Classic Veg Burger",p:149,v:1,d:"Crispy patty, lettuce"},{id:"b",n:"Chicken Zinger",p:199,v:0,d:"Spicy fried chicken"},{id:"c",n:"Peri Peri Fries",p:99,v:1,d:"Crinkle cut"},{id:"d",n:"Chocolate Shake",p:139,v:1,d:"Thick shake"}]}
+];
+const CUIS=["All","Biryani","Pizza","South Indian","Chinese","Burgers"];
+const PAYS=[["upi","📱","UPI","Pay with any UPI app"],["card","💳","Credit / Debit card","Visa, Mastercard, RuPay"],["wallet","👛","Wallet","Sample balance ₹2,000"],["cod","💵","Cash on delivery","Pay when it arrives"]];
+const TIPS=[0,20,30,50];
+const S={phone:"",rest:null,cart:{},cuisine:"All",veg:false,coupon:false,tip:0,pay:"upi"};
+
+function go(n){
+  $$(".screen").forEach(s=>s.classList.toggle("on",s.id==="s-"+n));
+  $("#s-"+n).scrollTop=0;
+  if(n==="search")renderList();if(n==="menu")renderMenu();if(n==="cart")renderCart();if(n==="pay")renderPay();
+}
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("on"),1800)}
+document.addEventListener("click",e=>{const g=e.target.closest("[data-go]");if(g)go(g.dataset.go)});
+const count=()=>Object.values(S.cart).reduce((a,b)=>a+b,0);
+
+/* LOGIN */
+function loginStep(step){
+  const b=$("#login-body");
+  if(step==="phone"){
+    b.innerHTML=`<label class="f">Mobile number</label><div class="row" style="gap:8px"><span class="card" style="margin:0;padding:12px">+91</span><input class="in" id="ph" inputmode="numeric" maxlength="10" placeholder="10-digit number"></div><div class="err" id="le"></div><button class="btn" id="send" style="margin-top:8px">Get OTP</button>`;
+    $("#send").onclick=()=>{const v=$("#ph").value.trim();if(!/^\d{10}$/.test(v)){$("#le").textContent="Enter a valid 10-digit mobile number";return}S.phone=v;loginStep("otp")};
+  }else{
+    b.innerHTML=`<p>OTP sent to <b>+91 ${S.phone}</b> <button id="chg" style="color:var(--brand)">Change</button></p><div class="otp">${[0,1,2,3].map(()=>`<input class="in" inputmode="numeric" maxlength="1">`).join("")}</div><div class="err" id="le"></div><button class="btn" id="ver">Verify &amp; continue</button><p class="mute" style="margin-top:12px;text-align:center">Demo OTP: 1234</p>`;
+    const ins=$$(".otp input");ins[0].focus();
+    ins.forEach((el,i)=>{el.oninput=()=>{el.value=el.value.replace(/\D/g,"");if(el.value&&ins[i+1])ins[i+1].focus()};el.onkeydown=e=>{if(e.key==="Backspace"&&!el.value&&ins[i-1])ins[i-1].focus()}});
+    $("#chg").onclick=()=>loginStep("phone");
+    $("#ver").onclick=()=>{if(ins.map(x=>x.value).join("")!=="1234"){$("#le").textContent="Incorrect OTP. Try 1234";return}go("search")};
+  }
+}
+$("#logout").onclick=()=>{S.cart={};S.rest=null;loginStep("phone");go("login")};
+
+/* SEARCH */
+$("#cuis").innerHTML=CUIS.map(c=>`<span class="chip" data-c="${c}">${c}</span>`).join("");
+$("#cuis").onclick=e=>{const c=e.target.dataset.c;if(c){S.cuisine=c;renderList()}};
+$("#q").oninput=renderList;$("#vegOnly").onchange=e=>{S.veg=e.target.checked;renderList()};
+function renderList(){
+  const q=$("#q").value.trim().toLowerCase();
+  $$("#cuis .chip").forEach(c=>c.classList.toggle("on",c.dataset.c===S.cuisine));
+  let list=RESTS.filter(r=>(S.cuisine==="All"||r.cuisine===S.cuisine)&&(!q||(r.name+" "+r.cuisine+" "+r.menu.map(m=>m.n).join(" ")).toLowerCase().includes(q)));
+  if(S.veg)list=list.filter(r=>r.menu.some(m=>m.v));
+  $("#count").textContent=list.length+" restaurants";
+  $("#rl").innerHTML=list.length?list.map(r=>{
+    const hit=q&&r.menu.find(m=>m.n.toLowerCase().includes(q));
+    return `<div class="card rest" data-r="${r.id}"><div class="img" style="--c:${r.color}">${r.emoji}</div><div style="flex:1;min-width:0">
+    <div class="row"><b>${r.name}</b><span class="rate">${r.rating} ★</span></div><div class="mute">${r.cuisine} · ${r.eta} min · ${r.km} km</div>
+    ${hit?`<div style="margin-top:4px;font-size:13px">🔎 ${hit.n}</div>`:""}
+    ${r.offer?`<div style="margin-top:6px"><span class="pill">🏷️ ${r.offer}</span></div>`:""}</div></div>`}).join(""):`<div class="center mute">No restaurants found.<br>Try another search or filter.</div>`;
+}
+$("#rl").onclick=e=>{const c=e.target.closest("[data-r]");if(!c)return;const r=RESTS.find(x=>x.id==+c.dataset.r);
+  if(S.rest&&S.rest.id!==r.id&&count()){if(!confirm("Your cart has items from "+S.rest.name+". Start a new cart?"))return;S.cart={};S.coupon=false}
+  S.rest=r;go("menu")};
+
+/* MENU */
+function renderMenu(){
+  const r=S.rest;$("#mn").textContent=r.name;$("#mi").textContent=`★ ${r.rating} · ${r.eta} min · ${r.km} km`;
+  $("#mb").innerHTML=(r.offer?`<div class="card" style="background:var(--brand-l);border-color:var(--brand)">🏷️ <b>${r.offer}</b></div>`:"")+
+   r.menu.filter(m=>!S.veg||m.v).map(m=>{const q=S.cart[m.id]||0;return `<div class="card row" style="align-items:flex-start"><div style="flex:1"><span class="${m.v?"veg":"nv"}"></span><b>${m.n}</b><div style="font-weight:600">${inr(m.p)}</div><div class="mute">${m.d}</div></div>
+   ${q?`<div class="qty"><button data-m="${m.id}" data-d="-1">−</button><span>${q}</span><button data-m="${m.id}" data-d="1">+</button></div>`:`<button class="add" data-m="${m.id}" data-d="1">ADD</button>`}</div>`}).join("");
+  const n=count();$("#mfoot").style.display=n?"block":"none";
+  if(n){$("#mcount").textContent=n+" item"+(n>1?"s":"");$("#msum").textContent="Item total "+inr(calc().items)}
+}
+function bump(id,d){const v=(S.cart[id]||0)+d;if(v<=0)delete S.cart[id];else if(v>10){S.cart[id]=10;toast("Max 10 per item")}else S.cart[id]=v}
+$("#mb").onclick=e=>{const b=e.target.closest("[data-m]");if(b){bump(b.dataset.m,+b.dataset.d);renderMenu()}};
+
+/* CART */
+function calc(){
+  const r=S.rest;let items=0;
+  for(const [id,q] of Object.entries(S.cart))items+=r.menu.find(m=>m.id===id).p*q;
+  const delivery=items>=399?0:Math.round(25+r.km*8);
+  const platform=5,packing=Math.min(40,count()*8);
+  const disc=S.coupon&&items>=199?Math.min(100,Math.round(items*.2)):0;
+  const gst=Math.round((items-disc)*.05+ (packing+platform)*.18);
+  const tip=S.tip;
+  return {items,delivery,platform,packing,disc,gst,tip,total:items-disc+delivery+platform+packing+gst+tip,couponOk:S.coupon&&items>=199};
+}
+function renderCart(){
+  const r=S.rest;
+  if(!count()){$("#cb").innerHTML=`<div class="center mute">Your cart is empty.<br><br><button class="btn" data-go="search">Browse restaurants</button></div>`;$("#topay").style.display="none";return}
+  $("#topay").style.display="block";const b=calc();
+  $("#cb").innerHTML=`<div class="card"><b>${r.emoji} ${r.name}</b><div class="mute">Delivery in ~${r.eta} min to Home · Indiranagar</div></div>
+  <div class="card">${Object.entries(S.cart).map(([id,q])=>{const m=r.menu.find(x=>x.id===id);return `<div class="row" style="padding:5px 0"><div><span class="${m.v?"veg":"nv"}"></span>${m.n}<div class="mute">${inr(m.p)}</div></div><div class="qty"><button data-q="${id}" data-d="-1">−</button><span>${q}</span><button data-q="${id}" data-d="1">+</button></div></div>`}).join("")}</div>
+  <div class="card row" id="cp" style="cursor:pointer"><div><b>🏷️ ${S.coupon?(b.couponOk?"SAVE20 applied":"Add ₹"+(199-b.items)+" more to use SAVE20"):"Apply coupon"}</b><div class="mute">${b.couponOk?"You save "+inr(b.disc):"SAVE20 · 20% off up to ₹100 on orders ₹199+"}</div></div><span style="color:var(--brand);font-weight:700">${S.coupon?"REMOVE":"APPLY"}</span></div>
+  <div class="card"><b>Tip your delivery partner</b><div style="margin-top:8px">${TIPS.map(t=>`<span class="chip ${S.tip===t?"on":""}" data-t="${t}">${t?"₹"+t:"No tip"}</span>`).join("")}</div></div>
+  <div class="card bill"><b>Bill details</b><div style="margin-top:8px">
+   <div class="row"><span>Item total</span><span>${inr(b.items)}</span></div>
+   ${b.disc?`<div class="row green"><span>Coupon SAVE20</span><span>−${inr(b.disc)}</span></div>`:""}
+   <div class="row"><span>Delivery fee (${r.km} km)</span><span>${b.delivery?inr(b.delivery):'<span class="green">FREE</span>'}</span></div>
+   <div class="row"><span>Platform fee</span><span>${inr(b.platform)}</span></div>
+   <div class="row"><span>Packing charges</span><span>${inr(b.packing)}</span></div>
+   <div class="row"><span>GST &amp; restaurant taxes</span><span>${inr(b.gst)}</span></div>
+   ${b.tip?`<div class="row"><span>Delivery tip</span><span>${inr(b.tip)}</span></div>`:""}
+   <div class="row tot"><span>To pay</span><span>${inr(b.total)}</span></div></div>
+   ${b.delivery===0?`<div class="pill" style="display:block;margin-top:10px;padding:8px;text-align:center">🎉 Free delivery on orders ₹399+</div>`:`<div class="mute" style="margin-top:8px">Add ${inr(399-b.items)} more for free delivery</div>`}</div>`;
+  $("#topay").textContent=`Proceed to pay · ${inr(b.total)}`;
+}
+$("#cb").onclick=e=>{
+  const q=e.target.closest("[data-q]"),t=e.target.closest("[data-t]");
+  if(q){bump(q.dataset.q,+q.dataset.d);renderCart()}
+  if(t){S.tip=+t.dataset.t;renderCart()}
+  if(e.target.closest("#cp")){S.coupon=!S.coupon;renderCart();if(S.coupon&&calc().couponOk)toast("Coupon applied")}
+};
+$("#topay").onclick=()=>go("pay");
+
+/* PAYMENT */
+function renderPay(){
+  const b=calc();
+  $("#pb").innerHTML=`<div class="card row"><div><div class="mute">Amount to pay</div><b style="font-size:20px">${inr(b.total)}</b></div><span class="pill">Sample · no real payment</span></div>
+  ${PAYS.map(p=>`<button class="opt ${S.pay===p[0]?"on":""}" data-p="${p[0]}"><span style="font-size:22px">${p[1]}</span><div style="flex:1"><b>${p[2]}</b><div class="mute">${p[3]}</div></div><span class="dot"></span></button>`).join("")}<div id="pf"></div>`;
+  $("#pf").innerHTML={upi:`<label class="f">UPI ID</label><input class="in" id="pv" value="demo@upi">`,card:`<label class="f">Card number</label><input class="in" id="pv" inputmode="numeric" maxlength="19" value="4111 1111 1111 1111"><div class="row" style="gap:10px;margin-top:10px"><input class="in" value="12/30"><input class="in" value="123"></div>`,wallet:`<div class="card mute">Wallet balance ₹2,000 will be used.</div>`,cod:`<div class="card mute">Keep exact change handy. Online payment is faster and contactless.</div>`}[S.pay];
+  $("#payBtn").textContent=S.pay==="cod"?`Place order · ${inr(b.total)}`:`Pay ${inr(b.total)}`;
+}
+$("#pb").onclick=e=>{const p=e.target.closest("[data-p]");if(p){S.pay=p.dataset.p;renderPay()}};
+$("#payBtn").onclick=()=>{
+  const pv=$("#pv");
+  if(S.pay==="upi"&&!/^[\w.\-]+@\w+$/.test(pv.value)){toast("Enter a valid UPI ID");return}
+  if(S.pay==="card"&&pv.value.replace(/\s/g,"").length<15){toast("Enter a valid card number");return}
+  S.paid=calc();go("proc");
+  setTimeout(()=>{S.oid="#"+Math.floor(100000+Math.random()*900000);S.t0=Date.now();renderTrack();go("track")},2200);
+};
+
+/* TRACKING */
+const STEPS=[["Order placed","Restaurant received your order"],["Preparing your food","Chef is cooking"],["Out for delivery","Rahul is on the way · 🏍️"],["Delivered","Enjoy your meal!"]];
+let timer;
+function renderTrack(){
+  clearInterval(timer);const r=S.rest,b=S.paid;
+  $("#tb").innerHTML=`<div class="card" style="text-align:center"><div style="font-size:38px">🎉</div><h3>Order placed!</h3><div class="mute">Order ID <b style="color:var(--ink)">${S.oid}</b></div></div>
+  <div class="card"><div class="row"><b>${r.emoji} ${r.name}</b><span class="mute" id="eta"></span></div>
+  <div class="mute" style="margin-top:6px">${Object.entries(S.cart).map(([id,q])=>q+" × "+r.menu.find(m=>m.id===id).n).join(", ")}</div>
+  <div class="row" style="margin-top:8px"><span class="mute">${S.pay==="cod"?"Pay on delivery":"Paid via "+PAYS.find(p=>p[0]===S.pay)[2]}</span><b>${inr(b.total)}</b></div></div>
+  <div class="map"><svg viewBox="0 0 300 150"><path d="M0 110 Q80 90 130 100 T300 40" stroke="#fff" stroke-width="10" fill="none" opacity=".8"/><path d="M60 0 L90 150" stroke="#fff" stroke-width="6" opacity=".6"/>
+  <path id="route" d="M30 118 Q90 95 150 95 T265 48" stroke="var(--brand)" stroke-width="3" stroke-dasharray="6 5" fill="none"/>
+  <text x="14" y="135" font-size="18">🍽️</text><text x="255" y="42" font-size="20">🏠</text><text id="bike" font-size="18">🏍️</text></svg></div>
+  <div class="card"><b>Status</b><ul class="steps" id="st" style="margin-top:12px"></ul></div>
+  <div class="card row"><div><b>Delivery partner: Rahul</b><div class="mute">★ 4.8 · Sample contact</div></div><button class="add" onclick="toast('Calling… (prototype)')">Call</button></div>
+  <button class="btn" id="again">Order again</button>`;
+  $("#again").onclick=()=>{S.cart={};S.coupon=false;S.tip=0;S.rest=null;$("#tpill").textContent="Live";go("search")};
+  tick();timer=setInterval(tick,1000);
+}
+function tick(){
+  if(!$("#st"))return;
+  const sec=(Date.now()-S.t0)/1000,stage=Math.min(3,Math.floor(sec/5));
+  $("#st").innerHTML=STEPS.map((s,i)=>{const done=i<stage||stage===3;return `<li class="${done?"done":i===stage?"cur":""}"><span class="b">${done?"✓":i+1}</span><div>${s[0]}<div class="mute" style="font-weight:400;font-size:12px">${s[1]}</div></div></li>`}).join("");
+  $("#eta").textContent=stage===3?"Delivered":`Arriving in ~${Math.max(1,15-Math.floor(sec))}s (demo)`;
+  const p=$("#route"),pt=p.getPointAtLength(p.getTotalLength()*Math.min(1,sec/15)),c=$("#bike");
+  c.setAttribute("x",pt.x-9);c.setAttribute("y",pt.y+6);
+  if(stage===3){clearInterval(timer);$("#tpill").textContent="Delivered"}
+}
+loginStep("phone");
+</script>
+</body>
+</html>
