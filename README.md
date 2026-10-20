@@ -15,4 +15,4 @@ Product and UX case studies by Varun Kumar. Independent educational work, not af
 | Uber: Find My Ride | [`Uber`](./Uber) (5-page case study) | [Open](https://claude.ai/artifact/P3Z2SHTh8hFqwXZc7NhwgF) |
 | Zepto: increasing AOV | [`Zepto-AOV`](./Zepto-AOV) (5, 10 and 16-slide decks) | [Open](https://claude.ai/artifact/6CNpU7TGwwWinWqd9R2RmL) |
 
-Resume and full portfolio: [artifact](https://claude.ai/artifact/LSjCZrSgrP9G5gLKr24vPw) · [Resume repository](https://github.com/varunkumar1989/Resume) · [resume site](https://varun-pm-resume.netlify.app/)
+Resume and full portfolio: [artifact](https://claude.ai/artifact/LSjCZrSgrP9G5gLKr24vPw) · [Resume repository](https://github.com/varunkumar1989/Resume) · [resume site](https://final-varun-resume.netlify.app) · [`Resume` folder](./Resume)
