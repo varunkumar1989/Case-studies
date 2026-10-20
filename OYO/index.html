@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Stay Booking Prototype</title>
+<style>
+:root{
+  --brand:#d6285a;--brand-d:#a81a43;--brand-l:#fde8ee;
+  --ink:#1c1b22;--mute:#6b6a76;--line:#e8e7ee;--bg:#f5f4f8;--card:#fff;
+  --ok:#14804a;--ok-l:#e2f5ea;--warn:#b45309;--warn-l:#fef3c7;
+  --r:14px;
+}
+@media (prefers-color-scheme:dark){
+  :root{--ink:#f2f1f6;--mute:#a3a2b0;--line:#34333f;--bg:#15141b;--card:#201f28;--brand-l:#3a1824;--ok-l:#12301f;--warn-l:#3a2c10}
+}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+body{font:15px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#0000;color:var(--ink);background:var(--bg);min-height:100vh;display:flex;justify-content:center}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+#app{width:100%;max-width:430px;height:100vh;height:100dvh;background:var(--bg);position:relative;display:flex;flex-direction:column;overflow:hidden}
+@media(min-width:500px){body{padding:20px;background:#0001}#app{height:min(860px,calc(100vh - 40px));border-radius:28px;box-shadow:0 20px 60px #0004;border:1px solid var(--line)}}
+.tag{background:var(--ink);color:var(--bg);font-size:11px;text-align:center;padding:5px 8px;letter-spacing:.2px;flex:none}
+.screen{flex:1;overflow-y:auto;display:none;flex-direction:column;animation:in .2s}
+.screen.on{display:flex}
+@keyframes in{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
+.top{display:flex;align-items:center;gap:10px;padding:14px 16px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.top h2{font-size:17px;flex:1}
+.back{width:36px;height:36px;border-radius:50%;background:var(--bg);font-size:18px}
+.pad{padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px}
+.btn{display:block;width:100%;background:var(--brand);color:#fff;font-weight:600;padding:14px;border-radius:12px;text-align:center}
+.btn:active{background:var(--brand-d)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:var(--card);color:var(--brand);border:1px solid var(--brand)}
+.foot{position:sticky;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:var(--card);border-top:1px solid var(--line);margin-top:auto}
+label.f{display:block;font-size:12px;color:var(--mute);margin-bottom:4px}
+input.in{width:100%;padding:13px;border:1px solid var(--line);border-radius:12px;background:var(--card);outline:none}
+input.in:focus{border-color:var(--brand)}
+.mute{color:var(--mute);font-size:13px}
+.chip{display:inline-block;padding:6px 12px;border-radius:99px;border:1px solid var(--line);background:var(--card);font-size:13px;margin:0 6px 6px 0}
+.chip.on{background:var(--brand-l);border-color:var(--brand);color:var(--brand);font-weight:600}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.hero{background:linear-gradient(160deg,var(--brand),#7a1236);color:#fff;padding:36px 22px 28px}
+.hero h1{font-size:28px;line-height:1.15;margin:30px 0 8px}
+.logo{display:inline-block;background:#fff3;border-radius:10px;padding:6px 12px;font-weight:700;letter-spacing:.5px}
+.otp{display:flex;gap:10px;margin:10px 0}
+.otp input{width:100%;text-align:center;font-size:22px;padding:12px 0}
+.img{border-radius:12px;background:var(--c,#ccc);display:flex;align-items:center;justify-content:center;font-size:34px;flex:none}
+.hotel{display:flex;gap:12px;cursor:pointer}
+.hotel .img{width:96px;height:96px}
+.rate{background:var(--ok);color:#fff;font-size:12px;font-weight:700;border-radius:6px;padding:2px 6px}
+.price{font-weight:700;font-size:17px}
+.strike{text-decoration:line-through;color:var(--mute);font-size:13px;font-weight:400}
+.pill{font-size:11px;padding:2px 8px;border-radius:99px;background:var(--ok-l);color:var(--ok);font-weight:600}
+.qty{display:inline-flex;align-items:center;border:1px solid var(--brand);border-radius:10px;overflow:hidden;color:var(--brand);font-weight:700}
+.qty button{width:34px;height:34px;color:var(--brand);font-size:18px}
+.qty span{min-width:26px;text-align:center}
+.add{border:1px solid var(--brand);color:var(--brand);font-weight:700;border-radius:10px;padding:7px 20px}
+.bill div.row{padding:5px 0}
+.bill .tot{border-top:1px dashed var(--line);margin-top:6px;padding-top:10px;font-weight:700;font-size:17px}
+.green{color:var(--ok)}
+.opt{display:flex;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:13px;margin-bottom:10px;background:var(--card);cursor:pointer;width:100%;text-align:left}
+.opt.on{border-color:var(--brand);background:var(--brand-l)}
+.dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);flex:none}
+.opt.on .dot{border:5px solid var(--brand)}
+.steps{list-style:none;padding:0;margin:0}
+.steps li{display:flex;gap:12px;padding-bottom:18px;position:relative;color:var(--mute)}
+.steps li::before{content:"";position:absolute;left:11px;top:24px;bottom:0;width:2px;background:var(--line)}
+.steps li:last-child::before{display:none}
+.steps .b{width:24px;height:24px;border-radius:50%;background:var(--line);flex:none;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;z-index:1}
+.steps li.done{color:var(--ink)}.steps li.done .b{background:var(--ok)}.steps li.done::before{background:var(--ok)}
+.steps li.cur{color:var(--ink);font-weight:600}.steps li.cur .b{background:var(--brand);animation:pulse 1.2s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 7px var(--brand-l)}}
+.map{height:150px;border-radius:12px;background:#d8e8e0;position:relative;overflow:hidden;margin-bottom:12px}
+@media(prefers-color-scheme:dark){.map{background:#243a31}}
+.map svg{width:100%;height:100%}
+.toast{position:absolute;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:99px;font-size:13px;opacity:0;pointer-events:none;transition:.25s;z-index:20;white-space:nowrap}
+.toast.on{opacity:1}
+.spin{width:44px;height:44px;border:4px solid var(--line);border-top-color:var(--brand);border-radius:50%;animation:sp .8s linear infinite;margin:0 auto 14px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.center{margin:auto;text-align:center;padding:30px}
+.err{color:#c0262d;font-size:12px;min-height:16px;margin-top:4px}
+.sticky-bar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="tag">Prototype · not affiliated with OYO</div>
+
+  <!-- 1 LOGIN -->
+  <section class="screen on" id="s-login">
+    <div class="hero">
+      <span class="logo">STAYS</span>
+      <h1>Rooms you can trust, in minutes.</h1>
+      <p style="opacity:.85">Sign in to book stays across 4 sample cities.</p>
+    </div>
+    <div class="pad" id="login-body"></div>
+    <div class="pad mute" style="margin-top:auto;text-align:center;font-size:12px">Sample data only. Any 10-digit number works; OTP is 1234.</div>
+  </section>
+
+  <!-- 2 SEARCH -->
+  <section class="screen" id="s-search">
+    <div class="hero" style="padding:20px 18px 70px">
+      <div class="row"><span class="logo">STAYS</span><button id="logout" class="mute" style="color:#fffc">Log out</button></div>
+      <h1 style="font-size:23px;margin:18px 0 0">Hi <span id="hi">there</span>, where to?</h1>
+    </div>
+    <div class="pad" style="margin-top:-56px">
+      <div class="card">
+        <label class="f">City, area or hotel</label>
+        <input class="in" id="q" placeholder="Try Bengaluru, Goa, Delhi…" autocomplete="off">
+        <div id="sugg" style="margin-top:8px"></div>
+        <div class="row" style="margin-top:12px;gap:10px">
+          <div style="flex:1"><label class="f">Check-in</label><input class="in" type="date" id="ci"></div>
+          <div style="flex:1"><label class="f">Check-out</label><input class="in" type="date" id="co"></div>
+        </div>
+        <div class="row" style="margin:14px 0">
+          <div><b>Guests</b><div class="mute" id="gl">2 guests</div></div>
+          <div class="qty"><button id="gm">−</button><span id="gn">2</span><button id="gp">+</button></div>
+        </div>
+        <button class="btn" id="go">Search stays</button>
+        <div class="err" id="serr"></div>
+      </div>
+      <h3 style="margin:18px 0 8px">Popular this week</h3>
+      <div id="pop"></div>
+    </div>
+  </section>
+
+  <!-- 3 RESULTS -->
+  <section class="screen" id="s-results">
+    <div class="top"><button class="back" data-go="search">←</button><div style="flex:1"><h2 id="rt">Results</h2><div class="mute" id="rs"></div></div></div>
+    <div class="pad" style="padding-bottom:0">
+      <span class="chip" data-f="all">All</span><span class="chip" data-f="rate">4★+</span><span class="chip" data-f="cheap">Under ₹1,500</span><span class="chip" data-f="free">Free cancellation</span>
+    </div>
+    <div class="pad" id="rl"></div>
+  </section>
+
+  <!-- 4 DETAIL / MENU -->
+  <section class="screen" id="s-hotel">
+    <div class="top"><button class="back" data-go="results">←</button><h2 id="hn"></h2></div>
+    <div id="hd"></div>
+    <div class="foot" id="hfoot" style="display:none"><div class="sticky-bar"><div><b id="hcount"></b><div class="mute" id="hsum"></div></div><button class="btn" style="width:auto;padding:12px 22px" data-go="cart">View booking</button></div></div>
+  </section>
+
+  <!-- 5 CART -->
+  <section class="screen" id="s-cart">
+    <div class="top"><button class="back" data-go="hotel">←</button><h2>Review booking</h2></div>
+    <div class="pad" id="cb"></div>
+    <div class="foot"><button class="btn" id="topay"></button></div>
+  </section>
+
+  <!-- 6 PAYMENT -->
+  <section class="screen" id="s-pay">
+    <div class="top"><button class="back" data-go="cart">←</button><h2>Payment</h2></div>
+    <div class="pad" id="pb"></div>
+    <div class="foot"><button class="btn" id="payBtn"></button></div>
+  </section>
+
+  <!-- 6b PROCESSING -->
+  <section class="screen" id="s-proc"><div class="center"><div class="spin"></div><b>Confirming your payment…</b><p class="mute">Please don't close this screen</p></div></section>
+
+  <!-- 7 TRACKING -->
+  <section class="screen" id="s-track">
+    <div class="top"><h2>Booking status</h2><span class="pill" id="tpill">Confirmed</span></div>
+    <div class="pad" id="tb"></div>
+  </section>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const inr=n=>"₹"+Math.round(n).toLocaleString("en-IN");
+const HOTELS=[
+ {id:1,name:"Lakeview Residency",city:"Bengaluru",area:"Indiranagar",rating:4.4,reviews:1280,emoji:"🏨",color:"#f9d9c5",free:true,
+  am:["Free Wi-Fi","AC","TV","Power backup"],
+  rooms:[{id:"a",name:"Standard Room",bed:"1 Queen bed · 180 sq ft",price:1299,mrp:2199},{id:"b",name:"Deluxe Room",bed:"1 King bed · 240 sq ft",price:1799,mrp:2899},{id:"c",name:"Family Suite",bed:"2 Queen beds · 380 sq ft",price:2699,mrp:4199}]},
+ {id:2,name:"Palm Grove Inn",city:"Goa",area:"Calangute",rating:4.1,reviews:864,emoji:"🌴",color:"#cfe9d4",free:true,
+  am:["Pool","Free Wi-Fi","Breakfast available","AC"],
+  rooms:[{id:"a",name:"Garden Room",bed:"1 Double bed · 200 sq ft",price:1599,mrp:2599},{id:"b",name:"Pool Facing Room",bed:"1 King bed · 260 sq ft",price:2399,mrp:3799}]},
+ {id:3,name:"Capital Comfort Stay",city:"Delhi",area:"Karol Bagh",rating:3.9,reviews:2105,emoji:"🏙️",color:"#d6dcf5",free:false,
+  am:["Free Wi-Fi","AC","Lift","CCTV"],
+  rooms:[{id:"a",name:"Economy Room",bed:"1 Double bed · 150 sq ft",price:999,mrp:1799},{id:"b",name:"Premium Room",bed:"1 King bed · 210 sq ft",price:1399,mrp:2299}]},
+ {id:4,name:"Marine Drive Suites",city:"Mumbai",area:"Churchgate",rating:4.6,reviews:640,emoji:"🌊",color:"#cde8f3",free:true,
+  am:["Sea view","Free Wi-Fi","Breakfast available","Gym"],
+  rooms:[{id:"a",name:"City Room",bed:"1 Queen bed · 190 sq ft",price:2899,mrp:4499},{id:"b",name:"Sea View Suite",bed:"1 King bed · 320 sq ft",price:4299,mrp:6499}]},
+ {id:5,name:"Old Town Heritage Home",city:"Goa",area:"Panjim",rating:4.3,reviews:412,emoji:"🏡",color:"#f3e3b8",free:true,
+  am:["Courtyard","Free Wi-Fi","AC"],
+  rooms:[{id:"a",name:"Heritage Room",bed:"1 Queen bed · 220 sq ft",price:1899,mrp:2999}]},
+ {id:6,name:"Tech Park Lodge",city:"Bengaluru",area:"Whitefield",rating:3.8,reviews:973,emoji:"💼",color:"#e2d4f0",free:false,
+  am:["Free Wi-Fi","Desk","AC"],
+  rooms:[{id:"a",name:"Business Room",bed:"1 Double bed · 170 sq ft",price:1199,mrp:1999}]}
+];
+const ADDONS=[{id:"bf",name:"Breakfast",desc:"Veg buffet · per guest/night",price:199,per:"guest"},
+              {id:"pk",name:"Airport pickup",desc:"Sedan · one way",price:699,per:"flat"},
+              {id:"lc",name:"Late check-out till 3 PM",desc:"Subject to availability",price:349,per:"flat"}];
+const CITIES=["Bengaluru","Goa","Delhi","Mumbai"];
+const COUPONS={FIRST300:{label:"FIRST300 · ₹300 off on your first booking",off:300,min:1000}};
+
+const S={phone:"",user:"",city:"",ci:"",co:"",guests:2,filter:"all",hotel:null,rooms:{},addons:{},coupon:false,pay:"upi",trackTimer:null};
+
+/* helpers */
+function go(n){
+  $$(".screen").forEach(s=>s.classList.toggle("on",s.id==="s-"+n));
+  $("#s-"+n).scrollTop=0;
+  if(n==="results")renderResults();
+  if(n==="hotel")renderHotel();
+  if(n==="cart")renderCart();
+  if(n==="pay")renderPay();
+}
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("on"),1800)}
+document.addEventListener("click",e=>{const g=e.target.closest("[data-go]");if(g)go(g.dataset.go)});
+const nights=()=>Math.max(1,Math.round((new Date(S.co)-new Date(S.ci))/864e5));
+const fmtD=d=>new Date(d).toLocaleDateString("en-IN",{day:"numeric",month:"short"});
+
+/* LOGIN */
+function loginStep(step){
+  const b=$("#login-body");
+  if(step==="phone"){
+    b.innerHTML=`<label class="f">Mobile number</label>
+    <div class="row" style="gap:8px"><span class="card" style="margin:0;padding:12px">+91</span><input class="in" id="ph" inputmode="numeric" maxlength="10" placeholder="10-digit number"></div>
+    <div class="err" id="le"></div><button class="btn" id="sendOtp" style="margin-top:8px">Get OTP</button>`;
+    $("#sendOtp").onclick=()=>{const v=$("#ph").value.trim();
+      if(!/^\d{10}$/.test(v)){$("#le").textContent="Enter a valid 10-digit mobile number";return}
+      S.phone=v;loginStep("otp")};
+  }else{
+    b.innerHTML=`<p>OTP sent to <b>+91 ${S.phone}</b> <button id="chg" style="color:var(--brand)">Change</button></p>
+    <div class="otp">${[0,1,2,3].map(i=>`<input class="in" inputmode="numeric" maxlength="1" data-i="${i}">`).join("")}</div>
+    <div class="err" id="le"></div><button class="btn" id="verify">Verify &amp; continue</button>
+    <p class="mute" style="margin-top:12px;text-align:center">Demo OTP: 1234</p>`;
+    const ins=$$(".otp input");ins[0].focus();
+    ins.forEach((el,i)=>{el.oninput=()=>{el.value=el.value.replace(/\D/g,"");if(el.value&&ins[i+1])ins[i+1].focus()};
+      el.onkeydown=e=>{if(e.key==="Backspace"&&!el.value&&ins[i-1])ins[i-1].focus()}});
+    $("#chg").onclick=()=>loginStep("phone");
+    $("#verify").onclick=()=>{
+      if(ins.map(x=>x.value).join("")!=="1234"){$("#le").textContent="Incorrect OTP. Try 1234";return}
+      S.user="Guest";$("#hi").textContent=S.user;go("search");};
+  }
+}
+$("#logout").onclick=()=>{S.hotel=null;S.rooms={};S.addons={};loginStep("phone");go("login")};
+
+/* SEARCH */
+function initSearch(){
+  const t=new Date(),d=n=>{const x=new Date(t);x.setDate(x.getDate()+n);return x.toISOString().slice(0,10)};
+  $("#ci").value=S.ci=d(7);$("#co").value=S.co=d(9);$("#ci").min=d(0);
+  $("#ci").onchange=e=>{S.ci=e.target.value;if(S.co<=S.ci){const x=new Date(S.ci);x.setDate(x.getDate()+1);S.co=$("#co").value=x.toISOString().slice(0,10)}};
+  $("#co").onchange=e=>S.co=e.target.value;
+  const setG=n=>{S.guests=Math.min(8,Math.max(1,n));$("#gn").textContent=S.guests;$("#gl").textContent=S.guests+(S.guests>1?" guests":" guest")};
+  $("#gm").onclick=()=>setG(S.guests-1);$("#gp").onclick=()=>setG(S.guests+1);
+  const sg=()=>{const v=$("#q").value.trim().toLowerCase();
+    const m=CITIES.filter(c=>c.toLowerCase().includes(v));
+    $("#sugg").innerHTML=m.map(c=>`<span class="chip ${S.city===c?"on":""}" data-c="${c}">📍 ${c}</span>`).join("")};
+  $("#q").oninput=()=>{S.city="";sg()};
+  $("#sugg").onclick=e=>{const c=e.target.dataset.c;if(c){S.city=c;$("#q").value=c;sg()}};
+  sg();
+  $("#go").onclick=()=>{
+    const v=$("#q").value.trim().toLowerCase();
+    if(!v){$("#serr").textContent="Enter a city or hotel to search";return}
+    if(S.co<=S.ci){$("#serr").textContent="Check-out must be after check-in";return}
+    S.query=v;
+    if(!HOTELS.some(match)){$("#serr").textContent="No stays found. Try Bengaluru, Goa, Delhi or Mumbai";return}
+    $("#serr").textContent="";S.filter="all";go("results")};
+  $("#pop").innerHTML=HOTELS.slice(0,3).map(card).join("");
+  $("#pop").onclick=hotelClick;
+}
+const match=h=>(h.city+" "+h.name+" "+h.area).toLowerCase().includes(S.query||"");
+function card(h){const r=h.rooms[0];const off=Math.round((1-r.price/r.mrp)*100);
+ return `<div class="card hotel" data-h="${h.id}"><div class="img" style="--c:${h.color}">${h.emoji}</div>
+ <div style="flex:1;min-width:0"><div class="row"><b>${h.name}</b><span class="rate">${h.rating} ★</span></div>
+ <div class="mute">${h.area}, ${h.city} · ${h.reviews} reviews</div>
+ <div style="margin:6px 0">${h.free?'<span class="pill">Free cancellation</span>':''}</div>
+ <div><span class="price">${inr(r.price)}</span> <span class="strike">${inr(r.mrp)}</span> <span class="green" style="font-size:12px">${off}% off</span></div>
+ <div class="mute" style="font-size:12px">per night + taxes</div></div></div>`}
+function hotelClick(e){const c=e.target.closest("[data-h]");if(!c)return;
+  const h=HOTELS.find(x=>x.id==+c.dataset.h);
+  if(S.hotel&&S.hotel.id!==h.id&&Object.keys(S.rooms).length){S.rooms={};S.addons={};toast("Cart cleared for new stay")}
+  S.hotel=h;if(!S.ci){}go("hotel")}
+function renderResults(){
+  const f=S.filter;let list=HOTELS.filter(match);
+  if(f==="rate")list=list.filter(h=>h.rating>=4);
+  if(f==="cheap")list=list.filter(h=>h.rooms[0].price<1500);
+  if(f==="free")list=list.filter(h=>h.free);
+  $("#rt").textContent=S.city||"Search results";
+  $("#rs").textContent=`${fmtD(S.ci)} – ${fmtD(S.co)} · ${S.guests} guest${S.guests>1?"s":""} · ${list.length} stays`;
+  $$("[data-f]").forEach(c=>c.classList.toggle("on",c.dataset.f===f));
+  $("#rl").innerHTML=list.length?list.map(card).join(""):`<div class="center mute">No stays match these filters.<br><br><button class="btn ghost" onclick="S.filter='all';renderResults()">Clear filters</button></div>`;
+}
+$("#s-results").addEventListener("click",e=>{const c=e.target.closest("[data-f]");if(c){S.filter=c.dataset.f;renderResults()}});
+$("#rl").onclick=hotelClick;
+
+/* HOTEL (rooms + add-ons = "menu") */
+const roomCount=()=>Object.values(S.rooms).reduce((a,b)=>a+b,0);
+function renderHotel(){
+  const h=S.hotel;$("#hn").textContent=h.name;
+  $("#hd").innerHTML=`<div class="img" style="--c:${h.color};height:150px;border-radius:0;font-size:64px">${h.emoji}</div>
+  <div class="pad"><div class="card"><div class="row"><h3>${h.name}</h3><span class="rate">${h.rating} ★</span></div>
+  <div class="mute">${h.area}, ${h.city} · ${h.reviews} reviews</div>
+  <div style="margin-top:10px">${h.am.map(a=>`<span class="chip">${a}</span>`).join("")}</div></div>
+  <h3 style="margin:6px 0 8px">Choose rooms</h3>
+  ${h.rooms.map(r=>{const q=S.rooms[r.id]||0;return `<div class="card"><div class="row" style="align-items:flex-start"><div><b>${r.name}</b><div class="mute">${r.bed}</div>
+   <div style="margin-top:6px"><span class="price">${inr(r.price)}</span> <span class="strike">${inr(r.mrp)}</span></div><div class="mute" style="font-size:12px">per night</div></div>
+   ${q?`<div class="qty"><button data-r="${r.id}" data-d="-1">−</button><span>${q}</span><button data-r="${r.id}" data-d="1">+</button></div>`:`<button class="add" data-r="${r.id}" data-d="1">ADD</button>`}</div></div>`}).join("")}
+  <h3 style="margin:14px 0 8px">Add-ons</h3>
+  ${ADDONS.map(a=>`<div class="card row"><div><b>${a.name}</b><div class="mute">${a.desc}</div><div class="price" style="font-size:15px">${inr(a.price)}</div></div>
+   <button class="add ${S.addons[a.id]?"on":""}" data-a="${a.id}" style="${S.addons[a.id]?"background:var(--brand);color:#fff":""}">${S.addons[a.id]?"ADDED":"ADD"}</button></div>`).join("")}
+  </div>`;
+  const n=roomCount();$("#hfoot").style.display=n?"block":"none";
+  if(n){$("#hcount").textContent=n+" room"+(n>1?"s":"")+" selected";$("#hsum").textContent=`${nights()} night${nights()>1?"s":""} · from ${inr(calc().subtotal)}`}
+}
+$("#hd").onclick=e=>{
+  const r=e.target.closest("[data-r]"),a=e.target.closest("[data-a]");
+  if(r){const id=r.dataset.r;S.rooms[id]=Math.max(0,(S.rooms[id]||0)+ +r.dataset.d);if(!S.rooms[id])delete S.rooms[id];
+    if(S.rooms[id]>4){S.rooms[id]=4;toast("Max 4 rooms per booking")}renderHotel()}
+  if(a){const id=a.dataset.a;S.addons[id]?delete S.addons[id]:S.addons[id]=1;renderHotel()}
+};
+
+/* CART + BILL */
+function calc(){
+  const h=S.hotel,n=nights();let sub=0,mrp=0;
+  for(const [id,q] of Object.entries(S.rooms)){const r=h.rooms.find(x=>x.id===id);sub+=r.price*q*n;mrp+=r.mrp*q*n}
+  const rooms=sub;let add=0;
+  for(const id of Object.keys(S.addons)){const a=ADDONS.find(x=>x.id===id);add+=a.per==="guest"?a.price*S.guests*n:a.price}
+  const deal=mrp-rooms;
+  const c=COUPONS.FIRST300,couponOk=S.coupon&&rooms>=c.min,disc=couponOk?c.off:0;
+  const taxable=rooms+add-disc;
+  const gstRate=(rooms/Math.max(1,roomCount())/n)>7500?0.18:(rooms/Math.max(1,roomCount())/n)>1000?0.12:0;
+  const gst=Math.round(taxable*gstRate);
+  const fee=49;
+  return {n,rooms,add,deal,disc,gstRate,gst,fee,subtotal:rooms+add,total:taxable+gst+fee,couponOk,mrp};
+}
+function renderCart(){
+  const h=S.hotel,b=calc(),rc=roomCount();
+  if(!rc){$("#cb").innerHTML=`<div class="center mute">No rooms selected.<br><br><button class="btn" data-go="results">Browse stays</button></div>`;$("#topay").style.display="none";return}
+  $("#topay").style.display="block";
+  $("#cb").innerHTML=`
+  <div class="card"><b>${h.name}</b><div class="mute">${h.area}, ${h.city}</div>
+   <div class="row" style="margin-top:10px"><div><div class="mute">Check-in</div><b>${fmtD(S.ci)}</b> <span class="mute">12 PM</span></div>
+   <span class="pill" style="background:var(--bg);color:var(--mute)">${b.n} night${b.n>1?"s":""}</span>
+   <div style="text-align:right"><div class="mute">Check-out</div><b>${fmtD(S.co)}</b> <span class="mute">11 AM</span></div></div>
+   <div class="mute" style="margin-top:8px">${S.guests} guest${S.guests>1?"s":""}</div></div>
+  <div class="card">${Object.entries(S.rooms).map(([id,q])=>{const r=h.rooms.find(x=>x.id===id);return `<div class="row" style="padding:4px 0"><div><b>${r.name}</b><div class="mute">${inr(r.price)} × ${b.n} night${b.n>1?"s":""}</div></div>
+    <div class="qty"><button data-q="${id}" data-d="-1">−</button><span>${q}</span><button data-q="${id}" data-d="1">+</button></div></div>`}).join("")}
+   ${Object.keys(S.addons).map(id=>{const a=ADDONS.find(x=>x.id===id);return `<div class="row mute" style="padding-top:8px"><span>${a.name}</span><button data-rm="${id}" style="color:var(--brand)">Remove</button></div>`}).join("")}</div>
+  <div class="card row" style="cursor:pointer" id="cp"><div><b>🏷️ ${S.coupon?(b.couponOk?"FIRST300 applied":"Min. room total ₹1,000 needed"):"Apply coupon"}</b>
+   <div class="mute">${S.coupon&&b.couponOk?"You save "+inr(b.disc):COUPONS.FIRST300.label}</div></div><span style="color:var(--brand);font-weight:700">${S.coupon?"REMOVE":"APPLY"}</span></div>
+  <div class="card bill"><b>Price details</b><div style="margin-top:8px">
+   <div class="row"><span>Room charges (${rc} × ${b.n} night${b.n>1?"s":""})</span><span>${inr(b.rooms)}</span></div>
+   ${b.add?`<div class="row"><span>Add-ons</span><span>${inr(b.add)}</span></div>`:""}
+   ${b.disc?`<div class="row green"><span>Coupon FIRST300</span><span>−${inr(b.disc)}</span></div>`:""}
+   <div class="row"><span>Taxes &amp; GST (${Math.round(b.gstRate*100)}%)</span><span>${inr(b.gst)}</span></div>
+   <div class="row"><span>Service fee</span><span>${inr(b.fee)}</span></div>
+   <div class="row tot"><span>Total payable</span><span>${inr(b.total)}</span></div></div>
+   ${b.deal+b.disc>0?`<div class="pill" style="display:block;margin-top:10px;padding:8px;text-align:center">🎉 You're saving ${inr(b.deal+b.disc)} on this booking</div>`:""}</div>
+  <p class="mute" style="font-size:12px">${h.free?"Free cancellation until 24 hours before check-in.":"Non-refundable booking."} Pay at hotel is not available for this stay.</p>`;
+  $("#topay").textContent=`Proceed to pay · ${inr(b.total)}`;
+}
+$("#cb").onclick=e=>{
+  const q=e.target.closest("[data-q]"),rm=e.target.closest("[data-rm]");
+  if(q){const id=q.dataset.q;S.rooms[id]+=+q.dataset.d;if(S.rooms[id]<=0){delete S.rooms[id];toast("Room removed")}if(S.rooms[id]>4){S.rooms[id]=4;toast("Max 4 rooms per booking")}renderCart()}
+  if(rm){delete S.addons[rm.dataset.rm];renderCart()}
+  if(e.target.closest("#cp")){S.coupon=!S.coupon;renderCart();if(S.coupon&&calc().couponOk)toast("Coupon applied")}
+};
+$("#topay").onclick=()=>go("pay");
+
+/* PAYMENT */
+const PAYS=[["upi","📱","UPI","Pay with any UPI app"],["card","💳","Credit / Debit card","Visa, Mastercard, RuPay"],["wallet","👛","Wallet","Sample wallet balance ₹5,000"],["nb","🏦","Net banking","All major banks"]];
+function renderPay(){
+  const b=calc();
+  $("#pb").innerHTML=`<div class="card row"><div><div class="mute">Amount to pay</div><b style="font-size:20px">${inr(b.total)}</b></div><span class="pill">100% secure · sample</span></div>
+  ${PAYS.map(p=>`<button class="opt ${S.pay===p[0]?"on":""}" data-p="${p[0]}"><span style="font-size:22px">${p[1]}</span><div style="flex:1"><b>${p[2]}</b><div class="mute">${p[3]}</div></div><span class="dot"></span></button>`).join("")}
+  <div id="pf"></div>`;
+  payForm();$("#payBtn").textContent=`Pay ${inr(b.total)}`;
+}
+function payForm(){
+  const f=$("#pf");
+  f.innerHTML={upi:`<label class="f">UPI ID</label><input class="in" id="pv" placeholder="name@bank" value="demo@upi">`,
+   card:`<label class="f">Card number</label><input class="in" id="pv" inputmode="numeric" maxlength="19" placeholder="4111 1111 1111 1111" value="4111 1111 1111 1111"><div class="row" style="gap:10px;margin-top:10px"><input class="in" placeholder="MM/YY" value="12/30"><input class="in" placeholder="CVV" value="123"></div>`,
+   wallet:`<div class="card mute">Wallet balance ₹5,000 will be used.</div>`,
+   nb:`<div class="card mute">You'll be redirected to your bank (simulated).</div>`}[S.pay];
+}
+$("#pb").onclick=e=>{const p=e.target.closest("[data-p]");if(p){S.pay=p.dataset.p;renderPay()}};
+$("#payBtn").onclick=()=>{
+  const pv=$("#pv");
+  if(S.pay==="upi"&&!/^[\w.\-]+@[\w]+$/.test(pv.value)){toast("Enter a valid UPI ID");return}
+  if(S.pay==="card"&&pv.value.replace(/\s/g,"").length<15){toast("Enter a valid card number");return}
+  S.paid=calc();go("proc");
+  setTimeout(()=>{S.bid="BK"+Math.floor(100000+Math.random()*900000);S.t0=Date.now();renderTrack();go("track")},2200);
+};
+
+/* TRACKING */
+const STEPS=[["Booking confirmed","Payment received, voucher sent"],["Hotel notified","Property has your details"],["Room being prepared","Housekeeping is on it"],["Ready for check-in","Show your booking ID at reception"]];
+function renderTrack(){
+  clearInterval(S.trackTimer);
+  const h=S.hotel,b=S.paid;
+  $("#tb").innerHTML=`<div class="card" style="text-align:center"><div style="font-size:38px">✅</div><h3>Booking confirmed!</h3>
+   <div class="mute">Booking ID <b style="color:var(--ink)">${S.bid}</b></div></div>
+  <div class="card"><b>${h.name}</b><div class="mute">${h.area}, ${h.city}</div>
+   <div class="mute" style="margin-top:6px">${fmtD(S.ci)} → ${fmtD(S.co)} · ${b.n} night${b.n>1?"s":""} · ${S.guests} guest${S.guests>1?"s":""}</div>
+   <div class="row" style="margin-top:8px"><span class="mute">Paid via ${PAYS.find(p=>p[0]===S.pay)[2]}</span><b>${inr(b.total)}</b></div></div>
+  <div class="map"><svg viewBox="0 0 300 150"><path d="M0 110 Q80 90 130 100 T300 40" stroke="#fff" stroke-width="10" fill="none" opacity=".8"/><path d="M60 0 L90 150" stroke="#fff" stroke-width="6" opacity=".6"/>
+   <path id="route" d="M20 120 Q90 95 150 95 T270 45" stroke="var(--brand)" stroke-width="3" stroke-dasharray="6 5" fill="none"/>
+   <text x="12" y="135" font-size="16">🧑</text><text x="258" y="40" font-size="20">📍</text><text id="cab" font-size="18">🚕</text></svg></div>
+  <div class="card"><div class="row" style="margin-bottom:12px"><b>Track your stay</b><span class="mute" id="eta"></span></div><ul class="steps" id="st"></ul></div>
+  <div class="card row"><div><b>Need help?</b><div class="mute">Hotel: +91 90000 00000 (sample)</div></div><button class="add" onclick="toast('Calling… (prototype)')">Call</button></div>
+  <button class="btn ghost" id="cancel" style="margin-bottom:10px">${h.free?"Cancel booking":"View cancellation policy"}</button>
+  <button class="btn" id="again">Book another stay</button>`;
+  $("#cancel").onclick=()=>{if(!h.free){toast("Non-refundable booking");return}
+    clearInterval(S.trackTimer);$("#tpill").textContent="Cancelled";$("#st").innerHTML=`<li class="cur"><span class="b">✕</span>Cancelled · refund of ${inr(b.total)} in 3–5 days</li>`;$("#cancel").remove();$("#eta").textContent=""};
+  $("#again").onclick=()=>{S.rooms={};S.addons={};S.coupon=false;S.hotel=null;$("#tpill").textContent="Confirmed";go("search")};
+  tick();S.trackTimer=setInterval(tick,1000);
+}
+function tick(){
+  if(!$("#st"))return;
+  const sec=(Date.now()-S.t0)/1000, stage=Math.min(3,Math.floor(sec/5)); // 5s per stage for demo
+  $("#st").innerHTML=STEPS.map((s,i)=>`<li class="${i<stage?"done":i===stage&&stage<3?"cur":i===3&&stage===3?"done":""}"><span class="b">${i<stage||stage===3?"✓":i+1}</span><div>${s[0]}<div class="mute" style="font-weight:400;font-size:12px">${s[1]}</div></div></li>`).join("");
+  const left=Math.max(0,15-Math.floor(sec));
+  $("#eta").textContent=stage===3?"Ready!":`Ready in ~${left}s (demo)`;
+  const p=$("#route"),pt=p.getPointAtLength(p.getTotalLength()*Math.min(1,sec/15)),c=$("#cab");
+  c.setAttribute("x",pt.x-9);c.setAttribute("y",pt.y+6);
+  if(stage===3)clearInterval(S.trackTimer);
+}
+
+/* init */
+loginStep("phone");initSearch();
+</script>
+</body>
+</html>
