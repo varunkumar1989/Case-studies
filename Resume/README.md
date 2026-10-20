@@ -12,7 +12,7 @@
 | Study | Folder | Artifact | Live site |
 |---|---|---|---|
 | OYO Two Journeys | [`OYO`](../OYO) | [Open](https://claude.ai/artifact/X16m61bmq12RqtwcoXgvqB) | [oyo-varun-v3.netlify.app](https://oyo-varun-v3.netlify.app/) |
-| Zomato Customer & Partner Prototype | [`Zomato`](../Zomato) | [Open](https://claude.ai/artifact/NL8yiaHhdPBHo8Gx5SPfBL) | [zomato-varun.netlify.app](https://zomato-varun.netlify.app/) |
+| Zomato Customer & Partner Prototype | [Resume repo](https://github.com/varunkumar1989/Resume/tree/main/resume-site/case-studies/zomato) | [Open](https://claude.ai/artifact/NL8yiaHhdPBHo8Gx5SPfBL) | [zomato-varun.netlify.app](https://zomato-varun.netlify.app/) |
 | Zepto AOV | [`Zepto-AOV`](../Zepto-AOV) | [Open](https://claude.ai/artifact/6CNpU7TGwwWinWqd9R2RmL) | |
 | Nykaa UX Teardown | [`Nykaa`](../Nykaa) | [Open](https://claude.ai/artifact/A7z8NgDnJfHCj6vKSRjcvB) | |
 | SkillOS Product Strategy | [`SkillOS`](../SkillOS) | [Open](https://claude.ai/artifact/SctuM4AvyfXhhDxD2apubX) | |
