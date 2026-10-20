@@ -9,5 +9,6 @@ Product and UX case studies by Varun Kumar. Independent educational work, not af
 | Zomato: earlier concept prototype and decks | [`Zomato`](./Zomato) | [Open](https://claude.ai/artifact/GQAmKHgKsu1PChwp24CcMY) |
 | Noon UAE: first-time buyer | [`Noon`](./Noon) (16-page PDF) | [Open](https://claude.ai/artifact/WnJNSE1AYzAQHhnBinYGzt) |
 | Klook: speedboat booking | [`Klook`](./Klook) (8-slide PDF) | [Open](https://claude.ai/artifact/NgvkYSWfS4hdnmYe1kjYhf) |
+| Slack: channel creation and onboarding | [`Slack`](./Slack) (7-page deck, 37-page report, onboarding audit) | [Channel Flow Lab](https://claude.ai/artifact/5C6J3f9tkuNsRa1DzTHA9W) · [Onboarding Audit](https://claude.ai/artifact/6opkweHAf8ZHoMTcuYQWQQ) |
 
 Resume and full portfolio: [artifact](https://claude.ai/artifact/LSjCZrSgrP9G5gLKr24vPw) · [Resume repository](https://github.com/varunkumar1989/Resume) · [resume site](https://varun-pm-resume.netlify.app/)

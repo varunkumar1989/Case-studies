@@ -1,0 +1,574 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Slack Channel Flow Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Interactive prototype: Slack journey from sign-in to creating a channel, on desktop app, web browser and iOS, current flow vs proposed redesign.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: page intro + platform/version switch → step rail | device stage, guide strip under the device */
+:root{
+  --page:#F4F2EE; --panel:#FFFFFF; --ink:#1D1C1D; --mut:#616061; --line:#E2DED8;
+  --aub:#4A154B; --aub2:#3F0E40; --aub3:#611F69; --sb-fg:#F3EAF3; --sb-mut:#CFC0D0; --sb-hi:#1164A3;
+  --green:#007A5A; --green-soft:#E3F3EE; --blue:#1264A3; --blue-soft:#E8F1FA; --red:#C4314B; --red-soft:#FBE7EB; --amb:#9A5B00; --amb-soft:#FDF2DD;
+  --hi:#E8912D;
+  --disp:"Bricolage Grotesque","Avenir Next",Arial,sans-serif; --body:"Lato","Helvetica Neue",Arial,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--page:#141214;--panel:#1C1A1D;--ink:#F2EEF2;--mut:#B5AEB6;--line:#353036;--green-soft:#0F2E26;--blue-soft:#13263A;--red-soft:#3A1720;--amb-soft:#33270F;--green:#3FC19A;--blue:#6FB3F0;--red:#F2788E;--amb:#E9B556;color-scheme:dark}}
+:root[data-theme="dark"]{--page:#141214;--panel:#1C1A1D;--ink:#F2EEF2;--mut:#B5AEB6;--line:#353036;--green-soft:#0F2E26;--blue-soft:#13263A;--red-soft:#3A1720;--amb-soft:#33270F;--green:#3FC19A;--blue:#6FB3F0;--red:#F2788E;--amb:#E9B556;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--page);color:var(--ink);font:15.5px/1.5 var(--body);margin:0}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--hi);outline-offset:2px}
+.pg{max-width:1320px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:30px 0}
+h1,h2,h3{font-family:var(--disp);margin:0;letter-spacing:-.015em;text-wrap:balance}
+.kick{font:600 12.5px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--aub3)}
+:root[data-theme="dark"] .kick{color:#D7A5DA}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .kick{color:#D7A5DA}}
+.top{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:24px;align-items:end}
+@media (max-width:880px){.top{grid-template-columns:1fr;gap:10px}}
+.top h1{font-size:clamp(32px,4.6vw,54px);font-weight:800;line-height:1;margin-top:8px}
+.top p{color:var(--mut);max-width:60ch}
+.links{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.links a{font-weight:700;font-size:14px;text-decoration:none;color:var(--ink);border:1.5px solid var(--line);background:var(--panel);border-radius:999px;padding:6px 14px;min-height:36px;display:inline-flex;align-items:center}.links a:hover{border-color:var(--aub3)}
+.meta{font:500 12.5px var(--mono);color:var(--mut);margin-top:8px}
+.ctrls{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:22px 0 4px}
+.seg{display:inline-flex;background:var(--panel);border:1.5px solid var(--line);border-radius:12px;padding:4px;gap:4px;flex-wrap:wrap}
+.seg button{border:0;background:none;border-radius:9px;padding:8px 14px;font-weight:700;cursor:pointer;min-height:40px;color:var(--mut)}
+.seg button[aria-pressed="true"]{background:var(--aub);color:#fff}
+.seg.v button[aria-pressed="true"]{background:var(--green);color:#fff}
+.lab{display:grid;grid-template-columns:230px minmax(0,1fr);gap:24px;padding-block:20px 30px;align-items:start}
+@media (max-width:980px){.lab{grid-template-columns:1fr}}
+.rail{display:flex;flex-direction:column;gap:2px;position:sticky;top:12px}
+@media (max-width:980px){.rail{position:static;flex-direction:row;overflow-x:auto;padding-bottom:6px}}
+.rail .sec{font:600 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mut);padding:12px 10px 4px}
+@media (max-width:980px){.rail .sec{display:none}}
+.rail button{display:grid;grid-template-columns:26px 1fr;gap:8px;align-items:center;border:0;background:none;text-align:left;padding:7px 10px;border-radius:10px;cursor:pointer;color:var(--mut);min-height:40px;font-size:14.5px}
+@media (max-width:980px){.rail button{flex:0 0 auto;white-space:nowrap;border:1.5px solid var(--line);background:var(--panel);border-radius:999px}}
+.rail i{font:600 11.5px var(--mono);font-style:normal;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center}
+.rail button[aria-current="step"]{background:var(--panel);color:var(--ink);font-weight:700}
+.rail button[aria-current="step"] i{background:var(--aub);border-color:var(--aub);color:#fff}
+.rail .core i{border-color:var(--green);color:var(--green)}
+.stagewrap{display:flex;flex-direction:column;gap:16px;min-width:0}
+.stage{display:flex;justify-content:center;min-width:0}
+.badge{display:inline-flex;align-items:center;gap:6px;font:600 11.5px var(--mono);border-radius:999px;padding:4px 10px;letter-spacing:.04em}
+.badge.rec{background:var(--amb-soft);color:var(--amb)} .badge.obs{background:var(--blue-soft);color:var(--blue)} .badge.pro{background:var(--green-soft);color:var(--green)}
+.guide{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:860px){.guide{grid-template-columns:1fr}}
+.gcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.gcard h3{font-size:16px}
+.gcard p,.gcard li{font-size:14.5px}
+.gcard ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.ghead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.ghead h2{font-size:clamp(22px,2.4vw,28px)}
+.nav{display:flex;gap:8px}
+.btn{border:1.5px solid var(--aub);background:var(--aub);color:#fff;border-radius:10px;padding:8px 16px;font-weight:700;cursor:pointer;min-height:42px}
+.btn.gh{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn[disabled]{opacity:.35;cursor:default}
+.foot{border-top:1px solid var(--line);padding-block:18px 36px;color:var(--mut);font-size:13.5px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.foot a{color:var(--blue)}
+
+/* ---------- Slack desktop / web mock (always light, like Slack default) ---------- */
+.win{width:min(980px,100%);height:600px;border-radius:12px;overflow:hidden;box-shadow:0 30px 60px -30px rgba(40,10,40,.5);display:flex;flex-direction:column;background:#fff;color:#1D1C1D;font-family:var(--body);position:relative;border:1px solid #d6d1d6}
+.tb{height:40px;background:#350D36;display:flex;align-items:center;gap:10px;padding:0 12px;color:#fff;flex:none}
+.tb .arr{opacity:.8;font-size:15px}
+.tb .search{flex:1;max-width:560px;margin:0 auto;background:rgba(255,255,255,.18);border-radius:6px;font-size:12.5px;padding:5px 10px;color:#eee}
+.tb .dots{display:flex;gap:6px}.tb .dots i{width:11px;height:11px;border-radius:50%;background:#ff5f57}.tb .dots i:nth-child(2){background:#febc2e}.tb .dots i:nth-child(3){background:#28c840}
+.browser{background:#DEE1E6;flex:none}
+.btabs{display:flex;align-items:flex-end;gap:4px;padding:8px 10px 0;height:38px}
+.btab{background:#fff;border-radius:8px 8px 0 0;padding:6px 14px;font-size:12px;display:flex;gap:6px;align-items:center;max-width:240px}
+.btab b{width:14px;height:14px;border-radius:3px;background:#4A154B;display:inline-block}
+.burl{background:#fff;display:flex;align-items:center;gap:10px;padding:6px 10px;font-size:12.5px;color:#444}
+.burl span{flex:1;background:#F1F3F4;border-radius:999px;padding:5px 14px}
+.app{flex:1;display:flex;min-height:0}
+.wrail{width:62px;background:#3F0E40;display:flex;flex-direction:column;align-items:center;gap:12px;padding:10px 0;color:#F3EAF3;font-size:10px;flex:none}
+.wrail .ws{width:36px;height:36px;border-radius:9px;background:#E8912D;color:#fff;display:grid;place-items:center;font:900 16px var(--body)}
+.wrail .ic{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;opacity:.85}
+.wrail .ic b{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-size:16px}
+.wrail .ic.on b{background:rgba(255,255,255,.2)}
+.wrail .plus{margin-top:auto;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.18);display:grid;place-items:center;font-size:20px;cursor:pointer;border:0;color:#fff}
+.wrail .me{width:30px;height:30px;border-radius:8px;background:#2EB67D;display:grid;place-items:center;font-weight:900;font-size:12px}
+.side{width:250px;background:#4A154B;color:#F3EAF3;display:flex;flex-direction:column;flex:none;font-size:14px;overflow:hidden}
+.side .wsn{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;font:900 17px var(--body)}
+.side .wsn span{font-size:16px;opacity:.85}
+.side .it{padding:3px 14px 3px 22px;display:flex;align-items:center;gap:8px;color:#CFC0D0;cursor:pointer;border-radius:6px;margin:0 8px}
+.side .it.on{background:#1164A3;color:#fff}
+.side .it.bold{color:#fff;font-weight:900}
+.side .hd{padding:10px 14px 4px;display:flex;justify-content:space-between;align-items:center;color:#CFC0D0}
+.side .hd b{font-weight:700}
+.side .hd button{border:0;background:none;color:#CFC0D0;font-size:18px;cursor:pointer;width:26px;height:26px;border-radius:6px}
+.side .hd button:hover{background:rgba(255,255,255,.15)}
+.side .av{width:20px;height:20px;border-radius:5px;display:inline-grid;place-items:center;font-size:10px;font-weight:900;color:#fff}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;background:#fff}
+.mh{padding:10px 18px;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;gap:10px}
+.mh b{font:900 17px var(--body)}
+.mh small{color:#616061}
+.msgs{flex:1;overflow:auto;padding:12px 18px;display:flex;flex-direction:column;gap:12px}
+.msg{display:grid;grid-template-columns:36px 1fr;gap:10px}
+.msg .a{width:36px;height:36px;border-radius:8px;display:grid;place-items:center;color:#fff;font-weight:900}
+.msg b{font-weight:900}.msg small{color:#616061;margin-left:6px}
+.msg p{margin:2px 0 0}
+.file{display:flex;gap:10px;align-items:center;border:1px solid #ddd;border-radius:8px;padding:8px 12px;margin-top:6px;max-width:320px}
+.file i{width:30px;height:36px;border-radius:5px;background:#E01E5A;color:#fff;display:grid;place-items:center;font-style:normal;font-size:10px;font-weight:900}
+.replies{color:#1264A3;font-weight:700;font-size:13px;margin-top:4px;cursor:pointer}
+.comp{margin:0 18px 14px;border:1px solid #bbb;border-radius:10px;overflow:hidden}
+.comp .bar{display:flex;gap:12px;padding:6px 10px;background:#F8F8F8;color:#777;font-size:13px}
+.comp .row{display:flex;align-items:center;gap:8px;padding:6px 10px}
+.comp input{flex:1;border:0;outline:0;font-size:14.5px;background:transparent;color:#1D1C1D;min-width:0}
+.comp .pl{width:28px;height:28px;border-radius:50%;border:1px solid #ccc;background:#fff;cursor:pointer;color:#1D1C1D}
+.comp .send{border:0;border-radius:6px;background:#007A5A;color:#fff;padding:6px 12px;cursor:pointer;font-weight:700}
+.intro{padding:16px 18px;display:flex;flex-direction:column;gap:6px}
+.intro h4{font:900 22px var(--body);margin:0}
+.intro .acts{display:flex;gap:8px;flex-wrap:wrap}
+.ob{border:1px solid #bbb;background:#fff;border-radius:6px;padding:6px 12px;font-weight:700;cursor:pointer;color:#1D1C1D}
+.ob.pr{background:#007A5A;border-color:#007A5A;color:#fff}
+.ob.hot,.mb.hot,.mob .hot{box-shadow:0 0 0 0 rgba(232,145,45,.7);animation:pulse 1.5s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(232,145,45,.75)}100%{box-shadow:0 0 0 12px rgba(232,145,45,0)}}
+@media (prefers-reduced-motion: reduce){.hot{animation:none!important;outline:3px solid #E8912D}}
+.overlay{position:absolute;inset:0;background:rgba(0,0,0,.45);display:grid;place-items:center;z-index:5}
+.modal{background:#fff;color:#1D1C1D;border-radius:10px;width:min(520px,92%);max-height:92%;overflow:auto;box-shadow:0 20px 50px rgba(0,0,0,.35);display:flex;flex-direction:column}
+.modal .mhd{display:flex;justify-content:space-between;align-items:center;padding:18px 22px 6px}
+.modal .mhd h3{font:900 21px var(--body);letter-spacing:0}
+.modal .x{border:0;background:none;font-size:22px;cursor:pointer;color:#616061}
+.modal .mbd{padding:6px 22px 14px;display:flex;flex-direction:column;gap:10px;font-size:14.5px}
+.modal .mft{padding:12px 22px 18px;display:flex;justify-content:space-between;align-items:center;gap:10px;border-top:1px solid #eee}
+.modal label{font-weight:700}
+.fld{border:1px solid #868686;border-radius:6px;padding:8px 10px;display:flex;align-items:center;gap:6px}
+.fld input,.fld textarea{border:0;outline:0;flex:1;font-size:15px;background:transparent;color:#1D1C1D;min-width:0}
+.fld:focus-within{border-color:#1264A3;box-shadow:0 0 0 3px rgba(18,100,163,.25)}
+.hint{font-size:12.5px;color:#616061}
+.err{font-size:12.5px;color:#C4314B;font-weight:700}
+.mb{border:0;border-radius:6px;background:#007A5A;color:#fff;padding:8px 16px;font-weight:700;cursor:pointer}
+.mb[disabled]{background:#ddd;color:#888;cursor:not-allowed;box-shadow:none;animation:none}
+.lk{border:0;background:none;color:#1264A3;font-weight:700;cursor:pointer;padding:4px}
+.radio{display:grid;grid-template-columns:20px 1fr;gap:10px;align-items:start;cursor:pointer;padding:6px 0}
+.radio i{width:18px;height:18px;border-radius:50%;border:2px solid #868686;margin-top:2px}
+.radio.on i{border:6px solid #1264A3}
+.vcard{border:1.5px solid #ccc;border-radius:10px;padding:12px;display:grid;grid-template-columns:30px 1fr 22px;gap:10px;cursor:pointer;text-align:left;background:#fff;color:#1D1C1D;width:100%}
+.vcard.on{border-color:#1264A3;background:#F2F8FD}
+.vcard .ico{width:30px;height:30px;border-radius:8px;background:#F4EDE4;display:grid;place-items:center}
+.vcard ul{margin:4px 0 0;padding-left:16px;font-size:13px;color:#454245}
+.vcard .rd{width:20px;height:20px;border-radius:50%;border:2px solid #868686}
+.vcard.on .rd{border:6px solid #1264A3}
+.steps3{display:flex;gap:6px;font:600 11.5px var(--mono);color:#616061}
+.steps3 span{padding:3px 8px;border-radius:999px;background:#F4F4F4}
+.steps3 span.on{background:#4A154B;color:#fff}
+.steps3 span.done{background:#E3F3EE;color:#007A5A}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid #ccc;border-radius:999px;padding:4px 10px 4px 4px;display:inline-flex;align-items:center;gap:6px;font-size:13px;background:#fff;cursor:pointer;color:#1D1C1D}
+.chip.on{background:#E8F1FA;border-color:#1264A3}
+.chip .av{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:10px;font-weight:900}
+.menu{position:absolute;z-index:6;background:#fff;color:#1D1C1D;border-radius:10px;box-shadow:0 12px 34px rgba(0,0,0,.3);padding:8px;width:260px;display:flex;flex-direction:column}
+.menu button{border:0;background:none;text-align:left;padding:8px 10px;border-radius:6px;cursor:pointer;display:flex;gap:10px;align-items:center;font-size:14.5px;color:#1D1C1D}
+.menu button:hover{background:#1264A3;color:#fff}
+.menu small{display:block;color:#616061;font-size:12px}
+.menu button:hover small{color:#e6eef6}
+.summary{border:1.5px solid #007A5A;background:#F0FAF6;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;margin:12px 18px}
+.summary h4{margin:0;font:900 18px var(--body);color:#007A5A}
+.summary .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.summary .grid div{background:#fff;border-radius:8px;padding:8px 10px;font-size:13px}
+.summary .grid b{display:block;font-size:14px}
+.signin{flex:1;display:grid;place-items:center;background:#fff;overflow:auto}
+.sbox{width:min(400px,90%);display:flex;flex-direction:column;gap:12px;text-align:center;padding:20px 0}
+.sbox h4{font:900 34px var(--body);margin:0}
+.logo{display:flex;align-items:center;justify-content:center;gap:8px;font:900 24px var(--body)}
+.logo i{width:26px;height:26px;display:grid;grid-template-columns:1fr 1fr;gap:3px}
+.logo i b{border-radius:4px}
+.sso{border:1.5px solid #ccc;border-radius:6px;padding:10px;font-weight:700;background:#fff;cursor:pointer;color:#1D1C1D}
+.big{border:0;border-radius:6px;background:#4A154B;color:#fff;padding:12px;font-weight:700;font-size:16px;cursor:pointer}
+.otp{display:flex;gap:8px;justify-content:center}
+.otp span{width:46px;height:58px;border:1.5px solid #bbb;border-radius:8px;display:grid;place-items:center;font:900 24px var(--body)}
+.wsrow{display:flex;align-items:center;gap:12px;border:1px solid #ddd;border-radius:10px;padding:12px;text-align:left}
+.wsrow .ws2{width:40px;height:40px;border-radius:9px;background:#E8912D;color:#fff;display:grid;place-items:center;font-weight:900}
+.toast{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);background:#1D1C1D;color:#fff;padding:9px 16px;border-radius:8px;font-size:13.5px;font-weight:700;z-index:9;white-space:nowrap;max-width:92%;overflow:hidden;text-overflow:ellipsis}
+.huddle{position:absolute;left:330px;bottom:16px;background:#1D1C1D;color:#fff;border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px;font-size:13px;z-index:4}
+.huddle i{width:10px;height:10px;border-radius:50%;background:#2EB67D}
+.thread{width:300px;border-left:1px solid #e8e8e8;display:flex;flex-direction:column;flex:none;background:#fff}
+@media (max-width:860px){.side{width:190px}.thread{display:none}}
+@media (max-width:640px){.side{display:none}.win{height:560px}}
+
+/* ---------- iOS mock ---------- */
+.phone{width:375px;max-width:100%;height:760px;background:#111;border-radius:52px;padding:12px;box-shadow:0 30px 60px -30px rgba(40,10,40,.55)}
+.mob{height:100%;border-radius:42px;overflow:hidden;background:#fff;color:#1D1C1D;display:flex;flex-direction:column;position:relative;font-family:var(--body);font-size:15px}
+.sbr{display:flex;justify-content:space-between;padding:14px 26px 6px;font-weight:700;font-size:14px}
+.mob.dark .sbr{color:#fff}
+.mhead{background:#4A154B;color:#fff;padding:0 16px 12px;display:flex;align-items:center;gap:10px}
+.mhead .ws{width:34px;height:34px;border-radius:9px;background:#E8912D;display:grid;place-items:center;font-weight:900}
+.mhead b{font:900 20px var(--body);flex:1}
+.mhead .me{width:32px;height:32px;border-radius:50%;background:#2EB67D;display:grid;place-items:center;font-weight:900;font-size:12px}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 14px;background:#4A154B}
+.tiles div{background:rgba(255,255,255,.12);color:#fff;border-radius:10px;padding:8px;font-size:12px}
+.tiles b{display:block;font-size:13px}
+.mlist{flex:1;overflow:auto;padding-bottom:90px}
+.mlist .h{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 4px;font-weight:900;font-size:14px;color:#616061}
+.mlist .h button{border:0;background:none;font-size:20px;color:#616061;cursor:pointer;width:32px;height:32px}
+.mlist .r{display:flex;align-items:center;gap:12px;padding:9px 16px;font-size:16px;cursor:pointer}
+.mlist .r .hash{width:22px;text-align:center;color:#616061;font-size:18px}
+.mlist .r.bold{font-weight:900}
+.mlist .r .av{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;color:#fff;font-size:11px;font-weight:900}
+.fab{position:absolute;right:18px;bottom:96px;width:56px;height:56px;border-radius:50%;background:#4A154B;color:#fff;border:0;font-size:28px;box-shadow:0 6px 16px rgba(0,0,0,.3);cursor:pointer;z-index:3}
+.tabs{position:absolute;left:12px;right:12px;bottom:14px;background:#fff;border-radius:30px;box-shadow:0 4px 18px rgba(0,0,0,.15);display:grid;grid-template-columns:repeat(4,1fr) 52px;padding:6px;font-size:11px;text-align:center;font-weight:700;color:#616061;z-index:3}
+.tabs span{display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 0;cursor:pointer}
+.tabs span.on{color:#4A154B;background:#F3EAF3;border-radius:22px}
+.tabs b{font-size:17px}
+.mnav{display:flex;align-items:center;gap:10px;padding:6px 14px 12px;border-bottom:1px solid #eee}
+.mnav button{border:0;background:#F4F4F4;border-radius:50%;width:36px;height:36px;font-size:17px;cursor:pointer;color:#1D1C1D}
+.mnav b{flex:1;text-align:center;font-size:17px}
+.mnav .act{border-radius:16px;width:auto;padding:0 14px;font-weight:700;background:#007A5A;color:#fff}
+.mnav .act[disabled]{background:#ddd;color:#888}
+.mbody{flex:1;overflow:auto;padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.mbody .fld{border-radius:10px}
+.sheet{position:absolute;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:flex-end;z-index:7}
+.sheet .pan{background:#fff;width:100%;border-radius:22px 22px 0 0;padding:10px 12px 30px;display:flex;flex-direction:column;gap:2px}
+.sheet .grab{width:40px;height:5px;border-radius:3px;background:#ccc;margin:0 auto 8px}
+.sheet button.opt{border:0;background:none;display:flex;gap:12px;align-items:center;padding:12px 10px;font-size:16px;border-radius:10px;cursor:pointer;text-align:left;color:#1D1C1D}
+.sheet button.opt:hover{background:#F4F4F4}
+.sheet button.opt b{width:34px;height:34px;border-radius:9px;background:#F4EDE4;display:grid;place-items:center}
+.mcomp{margin:8px 10px 26px;border:1px solid #ccc;border-radius:20px;display:flex;align-items:center;gap:8px;padding:6px 8px}
+.mcomp input{flex:1;border:0;outline:0;font-size:15px;background:transparent;min-width:0;color:#1D1C1D}
+.mcomp button{border:0;background:#F4F4F4;border-radius:50%;width:32px;height:32px;cursor:pointer;color:#1D1C1D}
+.mcomp .send{background:#007A5A;color:#fff}
+.mob .msgs{padding:12px 14px}
+.mob .intro{padding:16px}
+.mob .summary{margin:12px}
+.mob .summary .grid{grid-template-columns:1fr 1fr 1fr}
+.splash{flex:1;background:#4A154B;display:grid;place-items:center;color:#fff}
+</style>
+
+<main class="pg">
+  <header class="top">
+    <div>
+      <p class="kick">UX evaluation &amp; redesign · interactive prototype</p>
+      <h1>Slack: from sign-in to a new channel</h1>
+    </div>
+    <div>
+      <p>Walk through the full journey on the desktop app, a web browser or iPhone. Switch to <b>Proposed redesign</b> on the channel steps to compare. Names, workspace and messages are made up.</p>
+      <p class="links"><a href="Slack_Channel_Creation_UX_7_Pages.pdf" target="_blank" rel="noopener">7-page PDF</a><a href="Slack_UX_Detailed_Report_37_Pages.pdf" target="_blank" rel="noopener">Detailed report (37 pages)</a></p>
+      <p class="meta">Evaluated 19 Oct 2026 · iOS app 26.10.20 · desktop app (Windows) · Free plan · member role</p>
+    </div>
+  </header>
+
+  <div class="ctrls">
+    <div class="seg" role="group" aria-label="Platform"><button type="button" data-p="desk" aria-pressed="true">Desktop app</button><button type="button" data-p="web" aria-pressed="false">Web browser</button><button type="button" data-p="ios" aria-pressed="false">iPhone app</button></div>
+    <div class="seg v" role="group" aria-label="Version"><button type="button" data-v="cur" aria-pressed="true">Current flow</button><button type="button" data-v="new" aria-pressed="false">Proposed redesign</button></div>
+    <button class="btn gh" type="button" id="reset">Restart</button>
+  </div>
+
+  <section class="lab" aria-label="Prototype">
+    <nav class="rail" id="rail" aria-label="Journey steps"></nav>
+    <div class="stagewrap">
+      <div class="ghead"><div><p class="kick" id="stepk"></p><h2 id="stept"></h2></div><div class="nav"><button class="btn gh" id="prev" type="button">← Back</button><button class="btn" id="next" type="button">Next →</button></div></div>
+      <div class="stage" id="stage"></div>
+      <div class="guide">
+        <div class="gcard"><span class="badge obs" id="srcb"></span><h3>Try it</h3><p id="gtry"></p></div>
+        <div class="gcard"><h3>What we see</h3><ul id="gobs"></ul></div>
+        <div class="gcard"><h3 id="gfixh">Design notes</h3><ul id="gfix"></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot"><span>Concept prototype for a UX assignment. Not affiliated with Slack. Current screens are recreated from real screenshots (19 Oct 2026) and the Slack Help Center.</span><span>Sources: <a href="https://slack.com/help/articles/201402297-Create-a-channel" target="_blank" rel="noopener">Slack Help: Create a channel</a> · <a href="https://slack.com/blog/news/slack-feature-drop-april2026" target="_blank" rel="noopener">Slack Feature Drop, Apr 2026</a></span></footer>
+</main>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const stage=$('stage');
+const PEOPLE={pn:['Priya Nair','#2EB67D','PN'],ad:['Arjun Das','#1264A3','AD'],mi:['Meera Iyer','#E01E5A','MI'],ks:['Kabir Shah','#ECB22E','KS'],zk:['Zoya Khan','#36C5F0','ZK']};
+const STEPS=[
+ {k:'open',sec:'Get in',t:'Open the app'},
+ {k:'signin',sec:'Get in',t:'Sign in with email'},
+ {k:'code',sec:'Get in',t:'Enter the code'},
+ {k:'home',sec:'Work',t:'Home'},
+ {k:'dm',sec:'Work',t:'Message a teammate'},
+ {k:'file',sec:'Work',t:'Share a file'},
+ {k:'invite',sec:'Work',t:'Add someone'},
+ {k:'collab',sec:'Work',t:'Thread & huddle'},
+ {k:'c1',sec:'Create a channel',t:'Find “create channel”',core:1},
+ {k:'c2',sec:'Create a channel',t:'Name it',core:1},
+ {k:'c3',sec:'Create a channel',t:'Choose who can see it',core:1},
+ {k:'c4',sec:'Create a channel',t:'Add teammates',core:1},
+ {k:'c5',sec:'Create a channel',t:'Confirm it’s ready',core:1}
+];
+const S0=()=>({i:0,email:'',msgs:[{w:'pn',t:'Hi Rohan! Can you share the Orbit brief before Monday?',tm:'10:02 AM'}],file:false,invited:'',reply:false,huddle:false,menu:false,name:'',purpose:'',vis:null,members:[],created:false,sheet:false,typed:''});
+let P='desk',V='cur',st=S0();
+const av=(k,sz=36,r=8)=>{const p=PEOPLE[k];return `<span class="a" style="background:${p[1]};width:${sz}px;height:${sz}px;border-radius:${r}px;display:grid;place-items:center;color:#fff;font-weight:900;font-size:${sz*.36}px;flex:none">${p[2]}</span>`};
+const fmt=n=>n.toLowerCase().replace(/[^a-z0-9\-_ ]/g,'').replace(/\s+/g,'-').slice(0,80);
+const TAKEN=['general','random','design','proj-apollo'];
+const logo=`<span class="logo"><i><b style="background:#36C5F0"></b><b style="background:#2EB67D"></b><b style="background:#E01E5A"></b><b style="background:#ECB22E"></b></i>slack</span>`;
+/* ---------- guide content ---------- */
+const G={
+ open:{src:'rec',try:'Click <b>Open</b>. The desktop app and the iPhone app open straight into the last workspace once you are signed in.',obs:['Desktop app opens to a sign-in page the first time.','On the web, the same page lives at slack.com/signin.'],fix:['No change proposed. This flow is outside the channel-creation scope.']},
+ signin:{src:'rec',try:'Type any email and press <b>Sign in with email</b>.',obs:['Slack signs you in with a 6-digit code sent to your email, or with Google / Apple.','iOS Preferences also shows <b>Passkeys · NEW</b> (screenshot M02).'],fix:['Passwordless sign-in lowers effort and the risk of reused passwords.']},
+ code:{src:'rec',try:'The code fills itself in this demo. Press <b>Open Acme Studio</b>.',obs:['After the code, you pick a workspace.','Add workspaces screen lists “Sign in to another workspace / Join / Create” (M18).'],fix:['No change proposed.']},
+ home:{src:'obs',try:'Look at the sidebar: Channels, Direct messages and the <b>+</b> buttons. Then press <b>Next</b>.',obs:['Desktop: rail on the left (Home, DMs, Activity, Files, Agents & tools) and a <b>+</b> at the bottom (D1).','iPhone: Home with Catch Up, Threads, Huddles tiles, sections and a floating <b>+</b> (M12, M17).','Free plan shows upgrade banners in Files and Apps (D4, D6).'],fix:['Keep the 2023 layout: Slack moved creation into one <b>+</b> button after finding create options “scattered” (Diginomica, 2023).']},
+ dm:{src:'rec',try:'Type a reply to Priya and press Enter or <b>Send</b>.',obs:['Messages, threads, reactions and @mentions all happen in the conversation.','Drafts & Sent and Scheduled are one tap away on mobile (M05, M09).'],fix:['Outside scope; no change proposed.']},
+ file:{src:'rec',try:'Press the <b>+</b> in the message box and choose <b>Upload from your computer</b> (or Photos on iPhone).',obs:['Files appear inline and in the Files view (D4).','On the Free plan, canvases and lists show an upgrade prompt (D4).'],fix:['Outside scope.']},
+ invite:{src:'rec',try:'Open <b>Invite people</b>, type an email and press <b>Send</b>.',obs:['Invites to the workspace go by email or link. Slack Connect invitations are separate (M04).'],fix:['Outside scope.']},
+ collab:{src:'rec',try:'Press <b>1 reply</b> to open the thread, add a reply, then <b>Start a huddle</b>.',obs:['Threads keep side topics out of the channel (M15).','Huddles are quick audio/video calls (M16).'],fix:['Outside scope.']},
+ c1:{src:'rec',try:'Find the way to create a channel and press it.',obs:['Desktop: <b>+</b> at the bottom of the rail opens a create menu, and the Channels header has its own menu (Help Center).','iPhone: <b>Add channel</b> sits at the end of a long list (M12, M13) and the floating <b>+</b> can cover list rows.','Labels differ: “Add channel”, “+”, “Create a channel”.'],fix:['<b>F1/F2</b> One label everywhere: <b>Create channel</b>, pinned in the Channels header.','Split “Add channel” into <b>Create new</b> vs <b>Browse channels</b>.','Pad the list so the floating + never covers a row.'],h:['Consistency & standards','Jakob’s law','Fitts’s law']},
+ c2:{src:'rec',try:'Type a name like “Project Orbit”. In the proposed version also add a purpose.',obs:['Name only; spaces become dashes and capitals become lowercase (80 characters max).','No purpose or description is asked during creation (Help Center).'],fix:['<b>F5</b> Optional “What’s this channel for?” with examples.','Live preview of the final name and an instant “name taken” check.','Step indicator: 1 Name · 2 Who can see · 3 People (<b>F4</b>).'],h:['Recognition rather than recall','Visibility of system status']},
+ c3:{src:'rec',try:'Choose Public or Private.',obs:['Two options: Public (anyone in the workspace) or Private (only invited people).','The impact (search, history, changing later) is not explained at this moment.'],fix:['<b>F3</b> Two cards that say exactly who can see it and how many people that is.','Nothing pre-selected in the proposed version, so the choice is deliberate.','Note that changing it later may need an admin.'],h:['Error prevention','Match with the real world','Hick’s law (2 options is fine)']},
+ c4:{src:'rec',try:'Add Priya and Arjun, or skip.',obs:['After Create, an “Add people” step appears; it can be skipped.','People are added by typing names.'],fix:['Suggested teammates as one-tap chips.','“Add later” stays, but the summary shows 0 members as a gentle warning.'],h:['Flexibility & efficiency','Recognition rather than recall']},
+ c5:{src:'rec',try:'See what you get at the end.',obs:['You land in the empty channel with “This is the very beginning of #…”.','There is no single summary of name, visibility and members (<b>F6</b>).'],fix:['<b>F6</b> A “Your channel is ready” card: privacy, members, purpose, with fixes one tap away.','Next steps: post a first message, copy link, add a canvas.','Option: create it by asking Slackbot (Slack added channel-creating actions in April 2026) with a confirm step.'],h:['Visibility of system status','User control & freedom']}
+};
+/* ---------- desktop pieces ---------- */
+function side(sel){
+  const chans=['general','random','design','proj-apollo'].concat(st.created?[fmt(st.name)||'proj-orbit']:[]);
+  const curAdd=V==='cur'?`<div class="it" data-act="openmenu:side" style="color:#CFC0D0">＋ Add channels</div>`:`<div class="it" data-act="create" style="color:#fff;font-weight:700">＋ Create channel</div>`;
+  return `<div class="side"><div class="wsn">Acme Studio <span>✎</span></div>
+   <div class="it">🧵 Threads</div><div class="it">🎧 Huddles</div><div class="it">➤ Drafts &amp; sent</div>
+   <div class="hd"><b>▾ Channels</b>${V==='new'?`<button type="button" data-act="create" aria-label="Create channel" title="Create channel">＋</button>`:`<button type="button" data-act="openmenu:hd" aria-label="Channel options">⋮</button>`}</div>
+   ${chans.map(c=>`<div class="it ${sel==='#'+c?'on':''} ${c==='design'?'bold':''}"># ${c}${st.created&&c===(fmt(st.name)||'proj-orbit')&&st.vis==='private'?' 🔒':''}</div>`).join('')}
+   ${curAdd}
+   <div class="hd"><b>▾ Direct messages</b></div>
+   ${['pn','ad','mi','ks'].map(k=>`<div class="it ${sel===k?'on':''}"><span class="av" style="background:${PEOPLE[k][1]}">${PEOPLE[k][2]}</span>${PEOPLE[k][0]}</div>`).join('')}
+   <div class="it" data-act="go:invite">＋ Invite people</div></div>`;
+}
+function rail(){return `<div class="wrail"><div class="ws">A</div>${[['⌂','Home',1],['✉','DMs'],['🔔','Activity'],['🗂','Files'],['⋯','More']].map(x=>`<div class="ic ${x[2]?'on':''}"><b>${x[0]}</b>${x[1]}</div>`).join('')}<button class="plus ${st.i===8&&V==='cur'&&!st.menu?'hot':''}" type="button" data-act="openmenu:rail" aria-label="Create">＋</button><div class="me">RM</div></div>`}
+function chrome(inner){
+  if(P==='web') return `<div class="win"><div class="browser"><div class="btabs"><div class="btab"><b></b>Acme Studio – Slack</div></div><div class="burl">← → ⟳ <span>🔒 app.slack.com/client/T0ACME/C04ORBIT</span></div></div><div class="app">${inner}</div></div>`;
+  return `<div class="win"><div class="tb"><div class="dots"><i></i><i></i><i></i></div><span class="arr">← → 🕘</span><div class="search">🔍 Search Acme Studio</div><span>?</span></div><div class="app">${inner}</div></div>`;
+}
+function msgList(){return st.msgs.map((m,n)=>`<div class="msg">${av(m.w)}<div><b>${PEOPLE[m.w][0]}</b><small>${m.tm}</small><p>${m.t}</p>${m.file?`<div class="file"><i>PDF</i><div><b>orbit-brief.pdf</b><br><small style="margin:0">PDF · 240 KB</small></div></div>`:''}${n===0?`<div class="replies" data-act="thread">${st.reply?'2 replies':'1 reply'} · View thread</div>`:''}</div></div>`).join('')}
+function deskMain(){
+  const k=STEPS[st.i].k;
+  if(['c5'].includes(k)&&st.created) return chanView();
+  const dmHead=`<div class="mh">${av('pn',26,6)}<b>Priya Nair</b><small>· Product designer</small><span style="margin-left:auto" class="ob ${k==='collab'&&st.reply&&!st.huddle?'hot':''}" data-act="huddle">🎧 Huddle</span></div>`;
+  return `<div class="main">${dmHead}<div class="msgs">${msgList()}</div>
+   <div class="comp"><div class="bar"><b>B</b><i>I</i><s>S</s> 🔗 ⋮</div><form class="row" data-form="send"><button class="pl ${k==='file'&&!st.file?'hot':''}" type="button" data-act="attach" aria-label="Attach">＋</button><input id="cin" placeholder="Message Priya Nair" autocomplete="off" value="${st.typed}"><button class="send ${k==='dm'&&st.msgs.length<2?'hot':''}" type="submit">Send</button></form></div></div>
+   ${st.threadOpen?`<div class="thread"><div class="mh"><b>Thread</b><span style="margin-left:auto;cursor:pointer" data-act="thread">✕</span></div><div class="msgs">${`<div class="msg">${av('pn')}<div><b>Priya Nair</b><small>10:02 AM</small><p>Hi Rohan! Can you share the Orbit brief before Monday?</p></div></div><div class="msg">${av('ad')}<div><b>Arjun Das</b><small>10:20 AM</small><p>I can review it too.</p></div></div>${st.reply?`<div class="msg"><span class="a" style="background:#2EB67D;width:36px;height:36px;border-radius:8px;display:grid;place-items:center;color:#fff;font-weight:900">RM</span><div><b>Rohan Mehra</b><small>now</small><p>Thanks both, sharing it now.</p></div></div>`:''}`}</div>${st.reply?'':`<div class="comp"><div class="row"><span style="flex:1;color:#888">Reply…</span><button class="send hot" type="button" data-act="reply">Reply</button></div></div>`}</div>`:''}`;
+}
+function chanView(){
+  const n=fmt(st.name)||'proj-orbit';const mem=st.members.length+1;
+  const lock=st.vis==='private'?'🔒':'#';
+  return `<div class="main"><div class="mh"><b>${lock} ${n}</b><small>· ${mem} member${mem>1?'s':''}</small><span style="margin-left:auto" class="ob">👥 ${mem}</span></div>
+  ${V==='new'?summary():''}
+  <div class="intro"><h4>${lock} ${n}</h4><p style="margin:0;color:#454245">${V==='new'&&st.purpose?st.purpose:'This is the very beginning of the <b>'+lock+' '+n+'</b> channel.'}</p>
+   ${V==='cur'?`<div class="acts"><button class="ob" type="button">✎ Add description</button><button class="ob" type="button" data-act="addpeople">👤 Add people</button></div>`:''}</div>
+  <div style="flex:1"></div><div class="comp"><div class="row"><span style="flex:1;color:#888">Message ${lock} ${n}</span></div></div></div>`;
+}
+function summary(){
+  const n=fmt(st.name)||'proj-orbit';const mem=st.members.length+1;
+  return `<div class="summary" role="status"><h4>✓ #${n} is ready</h4>
+  <div class="grid"><div><span class="hint">Who can see it</span><b>${st.vis==='private'?'🔒 Only members':'# Everyone in Acme'}</b></div><div><span class="hint">Members</span><b>${mem} ${mem===1?'(just you)':''}</b></div><div><span class="hint">Purpose</span><b>${st.purpose?'Added ✓':'Not added'}</b></div></div>
+  <div class="chips"><button class="ob pr" type="button" data-act="toast:Opening the message box…">Post first message</button><button class="ob" type="button" data-act="toast:Link copied (demo)">Copy link</button><button class="ob" type="button" data-act="addpeople">${mem===1?'Add people (recommended)':'Add more people'}</button></div></div>`;
+}
+function menuHTML(where){
+  if(where==='side'||where==='hd') return `<div class="menu" style="left:${where==='side'?'90px':'210px'};top:${where==='side'?'250px':'160px'}"><button type="button" data-act="create">＋ Create a new channel<small>Start a new conversation space</small></button><button type="button" data-act="toast:Browse channels opens a searchable list (not shown)">🔍 Browse channels<small>Find and join existing ones</small></button></div>`;
+  return `<div class="menu" style="left:70px;bottom:60px"><b style="padding:6px 10px">Create</b><button type="button" data-act="toast:New message (not part of this demo)">✉ Message</button><button type="button" data-act="toast:Huddle (not part of this demo)">🎧 Huddle</button><button type="button" data-act="toast:Canvas needs a paid plan on Free workspaces">🗒 Canvas</button><button type="button" data-act="create" class="hot">＃ Channel</button><button type="button" data-act="toast:Lists need a paid plan on Free workspaces">☰ List</button></div>`;
+}
+function modalHTML(){
+  const k=STEPS[st.i].k;const n=fmt(st.name);const taken=TAKEN.includes(n);
+  if(k==='c2'){
+    if(V==='cur') return `<div class="overlay"><div class="modal" role="dialog" aria-label="Create a channel"><div class="mhd"><h3>Create a channel</h3><button class="x" type="button" data-act="cancel" aria-label="Close">✕</button></div>
+     <div class="mbd"><label for="cname">Name</label><div class="fld"># <input id="cname" maxlength="80" placeholder="e.g. plan-budget" value="${st.name}" autocomplete="off"></div>
+     ${taken?`<span class="err">That name is already taken by a channel.</span>`:`<span class="hint">Channels are where conversations happen around a topic. Use a name that is easy to find and understand.</span>`}</div>
+     <div class="mft"><span class="hint">Step 1 of 2</span><button class="mb ${n&&!taken?'hot':''}" type="button" data-act="next2" ${n&&!taken?'':'disabled'}>Next</button></div></div></div>`;
+    return `<div class="overlay"><div class="modal" role="dialog" aria-label="Create a channel"><div class="mhd"><h3>Create a channel</h3><button class="x" type="button" data-act="cancel" aria-label="Close">✕</button></div>
+     <div class="mbd"><div class="steps3"><span class="on">1 Name &amp; purpose</span><span>2 Who can see it</span><span>3 People</span></div>
+     <label for="cname">Channel name</label><div class="fld"># <input id="cname" maxlength="80" placeholder="e.g. proj-orbit" value="${st.name}" autocomplete="off"></div>
+     <span class="${taken?'err':'hint'}" id="nprev">${taken?'#'+n+' already exists. Try #'+n+'-2 or open the existing one.':n?'It will appear as <b>#'+n+'</b> · '+n.length+'/80':'Lowercase, no spaces. We convert it for you. Tip: start with proj-, team- or help-'}</span>
+     <label for="cpur">What’s this channel for? <span class="hint">(optional)</span></label><div class="fld"><input id="cpur" maxlength="250" placeholder="e.g. Plan and ship Project Orbit by Dec 15" value="${st.purpose}"></div>
+     <div class="chips">${['Plan and ship a project','Team updates','Ask for help'].map(x=>`<button class="chip" type="button" data-act="purp:${x}">${x}</button>`).join('')}</div></div>
+     <div class="mft"><span class="hint">You can change all of this later</span><button class="mb ${n&&!taken?'hot':''}" type="button" data-act="next2" ${n&&!taken?'':'disabled'}>Next</button></div></div></div>`;
+  }
+  if(k==='c3'){
+    if(V==='cur') return `<div class="overlay"><div class="modal" role="dialog" aria-label="Create a channel"><div class="mhd"><h3>Create a channel</h3><button class="x" type="button" data-act="cancel" aria-label="Close">✕</button></div>
+     <div class="mbd"><label>Visibility</label>
+     <div class="radio ${st.vis!=='private'?'on':''}" data-act="vis:public"><i></i><div><b>Public</b> – Anyone in Acme Studio</div></div>
+     <div class="radio ${st.vis==='private'?'on':''}" data-act="vis:private"><i></i><div><b>Private</b> – Only specific people<br><span class="hint">Can only be viewed or joined by invitation</span></div></div></div>
+     <div class="mft"><button class="lk" type="button" data-act="back2">← Back</button><button class="mb hot" type="button" data-act="createnow">Create</button></div></div></div>`;
+    return `<div class="overlay"><div class="modal" role="dialog" aria-label="Create a channel"><div class="mhd"><h3>Who can see #${n||'proj-orbit'}?</h3><button class="x" type="button" data-act="cancel" aria-label="Close">✕</button></div>
+     <div class="mbd"><div class="steps3"><span class="done">1 Name ✓</span><span class="on">2 Who can see it</span><span>3 People</span></div>
+     ${[['public','#','Public · anyone in Acme Studio',['124 people can find, read and join it','Messages and files show up in search for everyone','Good for open topics and announcements']],['private','🔒','Private · only people you add',['Only invited members can see it or find it in search','Good for confidential projects, HR, clients','Making it public later may need an admin']]].map(o=>`<button class="vcard ${st.vis===o[0]?'on':''}" type="button" data-act="vis:${o[0]}" aria-pressed="${st.vis===o[0]}"><span class="ico">${o[1]}</span><span><b>${o[2]}</b><ul>${o[3].map(x=>`<li>${x}</li>`).join('')}</ul></span><span class="rd"></span></button>`).join('')}
+     ${st.vis?'':`<span class="hint">Choose one to continue. Nothing is pre-selected.</span>`}</div>
+     <div class="mft"><button class="lk" type="button" data-act="back2">← Back</button><button class="mb ${st.vis?'hot':''}" type="button" data-act="createnow" ${st.vis?'':'disabled'}>Next: add people</button></div></div></div>`;
+  }
+  if(k==='c4'){
+    const sug=['pn','ad','mi','ks','zk'];
+    if(V==='cur') return `<div class="overlay"><div class="modal" role="dialog" aria-label="Add people"><div class="mhd"><h3>Add people to #${n||'proj-orbit'}</h3><button class="x" type="button" data-act="skip" aria-label="Close">✕</button></div>
+     <div class="mbd"><div class="fld"><input id="pin" placeholder="e.g. Priya, or name@acme.com" autocomplete="off"></div>
+     <div class="chips">${st.members.map(k2=>`<span class="chip on">${av(k2,22,11)}${PEOPLE[k2][0]} ✕</span>`).join('')}</div>
+     <span class="hint">Type a name and press Enter. Try “Priya” or “Arjun”.</span></div>
+     <div class="mft"><button class="lk" type="button" data-act="skip">Skip for now</button><button class="mb ${st.members.length?'hot':''}" type="button" data-act="done" ${st.members.length?'':'disabled'}>Add</button></div></div></div>`;
+    return `<div class="overlay"><div class="modal" role="dialog" aria-label="Add people"><div class="mhd"><h3>Add people</h3><button class="x" type="button" data-act="skip" aria-label="Close">✕</button></div>
+     <div class="mbd"><div class="steps3"><span class="done">1 Name ✓</span><span class="done">2 ${st.vis==='private'?'🔒 Private':'# Public'} ✓</span><span class="on">3 People</span></div>
+     <span class="hint">Suggested: people you work with most</span>
+     <div class="chips">${sug.map(k2=>`<button class="chip ${st.members.includes(k2)?'on':''}" type="button" data-act="tog:${k2}" aria-pressed="${st.members.includes(k2)}">${av(k2,22,11)}${PEOPLE[k2][0]} ${st.members.includes(k2)?'✓':'＋'}</button>`).join('')}</div>
+     <div class="fld"><input id="pin" placeholder="Or type a name or email" autocomplete="off"></div></div>
+     <div class="mft"><button class="lk" type="button" data-act="skip">Add later</button><button class="mb hot" type="button" data-act="done">${st.members.length?'Create with '+(st.members.length+1)+' members':'Create channel'}</button></div></div></div>`;
+  }
+  return '';
+}
+function desk(){
+  const k=STEPS[st.i].k;
+  if(k==='open') return chrome(`<div class="signin" style="background:#4A154B;color:#fff"><div class="sbox"><span class="logo" style="color:#fff"><i><b style="background:#36C5F0"></b><b style="background:#2EB67D"></b><b style="background:#E01E5A"></b><b style="background:#ECB22E"></b></i>slack</span><p>${P==='web'?'slack.com · Sign in to your workspace':'Slack for Windows'}</p><button class="big hot" style="background:#fff;color:#4A154B" type="button" data-act="next">Open</button></div></div>`);
+  if(k==='signin') return chrome(`<div class="signin"><form class="sbox" data-form="email">${logo}<h4>Enter your email</h4><p class="hint" style="font-size:14px">We suggest using the email address you use at work.</p><div class="fld"><input id="em" type="email" placeholder="name@work-email.com" value="${st.email}" autocomplete="off" aria-label="Email"></div><button class="big hot" type="submit">Sign in with email</button><span class="hint">OR</span><button class="sso" type="button" data-act="sso">Sign in with Google</button><button class="sso" type="button" data-act="sso">Sign in with Apple</button></form></div>`);
+  if(k==='code') return chrome(`<div class="signin"><div class="sbox">${logo}<h4>Check your email for a code</h4><p class="hint" style="font-size:14px">We sent a 6-character code to ${st.email||'rohan@acme.example'}. The code expires shortly.</p><div class="otp">${'XK4-92B'.replace('-','').split('').map(c=>`<span>${c}</span>`).join('')}</div><span class="hint" style="color:#007A5A;font-weight:700">✓ Code filled (demo)</span><div class="wsrow"><span class="ws2">A</span><div style="flex:1"><b>Acme Studio</b><br><span class="hint">acme-studio.slack.com · 124 members</span></div><button class="mb hot" type="button" data-act="next">Open</button></div></div></div>`);
+  const sel=st.created&&STEPS[st.i].k==='c5'?'#'+(fmt(st.name)||'proj-orbit'):'pn';
+  let main=['home'].includes(k)?homeMain():deskMain();
+  let over='';
+  if(st.menu) over=menuHTML(st.menu);
+  if(['c2','c3','c4'].includes(k)) over=modalHTML();
+  if(k==='invite') over=inviteModal();
+  if(k==='file'&&st.picker) over=`<div class="overlay"><div class="modal"><div class="mhd"><h3>Upload a file</h3><button class="x" type="button" data-act="nopick" aria-label="Close">✕</button></div><div class="mbd">${['orbit-brief.pdf · 240 KB','timeline.xlsx · 48 KB','logo.png · 120 KB'].map((f,n)=>`<button class="ob ${n===0?'hot':''}" type="button" data-act="pick" style="text-align:left">📄 ${f}</button>`).join('')}<span class="hint">Recreated file picker. Real app opens your computer’s file browser.</span></div></div></div>`;
+  return chrome(rail()+side(sel)+main+over+(st.huddle?`<div class="huddle"><i></i> Huddle with Priya · 00:12 <button class="ob" type="button" data-act="huddle" style="padding:2px 8px">Leave</button></div>`:''));
+}
+function homeMain(){return `<div class="main"><div class="mh"><b># design</b><small>· 18 members</small></div><div class="msgs"><div class="msg">${av('mi')}<div><b>Meera Iyer</b><small>9:40 AM</small><p>New icons are in the Figma file 🎉</p></div></div><div class="msg">${av('ks')}<div><b>Kabir Shah</b><small>9:52 AM</small><p>Looks great. Shipping Thursday.</p></div></div></div><div class="comp"><div class="row"><span style="flex:1;color:#888">Message #design</span></div></div></div>`}
+function inviteModal(){return `<div class="overlay"><div class="modal" role="dialog" aria-label="Invite people"><div class="mhd"><h3>Invite people to Acme Studio</h3><button class="x" type="button" data-act="next" aria-label="Close">✕</button></div><form class="mbd" data-form="invite"><label for="iv">To:</label><div class="fld"><input id="iv" type="email" placeholder="name@gmail.com" value="${st.invited}" autocomplete="off"></div>${st.invited?`<span class="hint" style="color:#007A5A;font-weight:700">✓ Invitation sent to ${st.invited} (demo)</span>`:'<span class="hint">They’ll get an email to join. Free plan: invitees join as full members.</span>'}<div class="mft" style="padding:8px 0 0;border:0"><button class="lk" type="button" data-act="toast:Invite link copied (demo)">🔗 Copy invite link</button><button class="mb ${st.invited?'':'hot'}" type="submit">Send</button></div></form></div></div>`}
+/* ---------- iOS ---------- */
+function phone(inner,dark){return `<div class="phone"><div class="mob ${dark?'dark':''}">${inner}</div></div>`}
+const sbar=(dark)=>`<div class="sbr" ${dark?'style="background:#4A154B;color:#fff"':''}><span>9:41</span><span>5G ▮▮▮ 84%</span></div>`;
+const tabsM=on=>`<div class="tabs">${[['⌂','Home'],['✉','DMs'],['🔔','Activity'],['⋯','More']].map(x=>`<span class="${x[1]===on?'on':''}"><b>${x[0]}</b>${x[1]}</span>`).join('')}<span><b>🔍</b></span></div>`;
+function iosHome(){
+  const chans=['general','random','design','proj-apollo','marketing','support','events','hiring'].concat(st.created?[fmt(st.name)||'proj-orbit']:[]);
+  return `${sbar(1)}<div class="mhead"><span class="ws">A</span><b>Acme Studio</b><span class="me">RM</span></div>
+   <div class="tiles"><div><b>Catch Up</b>4 new</div><div><b>Threads</b>1 new</div><div><b>Huddles</b>0 live</div></div>
+   <div class="mlist" id="ml"><div class="h">Unreads ›</div><div class="r bold" data-act="${STEPS[st.i].k==='dm'?'opendm':''}"><span class="av" style="background:#2EB67D">PN</span>Priya Nair</div>
+   <div class="h"><span>Channels ›</span>${V==='new'?`<button type="button" data-act="create" aria-label="Create channel" class="${st.i===8?'hot':''}" style="border-radius:50%">＋</button>`:''}</div>
+   ${chans.map(c=>`<div class="r"><span class="hash">${st.created&&c===(fmt(st.name)||'proj-orbit')&&st.vis==='private'?'🔒':'#'}</span>${c}</div>`).join('')}
+   ${V==='cur'?`<div class="r" data-act="sheetadd" style="color:#616061"><span class="hash">＋</span>Add channel</div>`:`<div class="r" data-act="create" style="color:#1264A3;font-weight:700"><span class="hash">＋</span>Create channel</div><div class="r" style="color:#616061" data-act="toast:Browse channels (not shown)"><span class="hash">🔍</span>Browse channels</div>`}
+   <div class="h">Direct messages ›</div>${['pn','ad','mi','ks'].map(k=>`<div class="r"><span class="av" style="background:${PEOPLE[k][1]}">${PEOPLE[k][2]}</span>${PEOPLE[k][0]}</div>`).join('')}
+   ${V==='new'?'<div style="height:70px"></div>':''}</div>
+   <button class="fab ${st.i===8&&V==='cur'?'hot':''}" type="button" data-act="sheet" aria-label="Create">＋</button>${tabsM('Home')}
+   ${st.sheet?`<div class="sheet" data-act="nosheet"><div class="pan"><div class="grab"></div><b style="padding:4px 10px">Create</b>${[['✉','Message','toast:New message (not in demo)'],['🎧','Huddle','toast:Huddle (not in demo)'],['＃','Channel','create'],['🗒','Canvas','toast:Canvas (paid plans)']].map(o=>`<button class="opt ${o[1]==='Channel'?'hot':''}" type="button" data-act="${o[2]}"><b>${o[0]}</b>${o[1]}</button>`).join('')}</div></div>`:''}
+   ${st.sheetAdd?`<div class="sheet" data-act="nosheet"><div class="pan"><div class="grab"></div><button class="opt hot" type="button" data-act="create"><b>＃</b>Create a new channel</button><button class="opt" type="button" data-act="toast:Browse channels (not in demo)"><b>🔍</b>Browse channels</button></div></div>`:''}`;
+}
+function iosConv(){
+  const k=STEPS[st.i].k;
+  return `${sbar()}<div class="mnav"><button type="button" data-act="prev" aria-label="Back">‹</button><b>Priya Nair</b><button type="button" class="${k==='collab'&&st.reply&&!st.huddle?'hot':''}" data-act="huddle" aria-label="Huddle">🎧</button></div>
+   <div class="msgs" style="flex:1;overflow:auto">${msgList()}${st.huddle?`<div class="file" style="border-color:#2EB67D"><i style="background:#2EB67D">🎧</i><div><b>Huddle live · 00:12</b><br><small style="margin:0">You and Priya</small></div></div>`:''}${st.threadOpen&&st.reply?`<div class="hint">Thread: you replied “Thanks both, sharing it now.”</div>`:''}</div>
+   ${k==='collab'&&st.threadOpen&&!st.reply?`<div style="padding:0 14px"><button class="mb hot" type="button" data-act="reply">Reply in thread: “Thanks both…”</button></div>`:''}
+   <form class="mcomp" data-form="send"><button type="button" class="${k==='file'&&!st.file?'hot':''}" data-act="attach" aria-label="Attach">＋</button><input id="cin" placeholder="Message Priya Nair" value="${st.typed}" autocomplete="off"><button class="send ${k==='dm'&&st.msgs.length<2?'hot':''}" type="submit" aria-label="Send">➤</button></form>
+   ${st.picker?`<div class="sheet"><div class="pan"><div class="grab"></div>${[['📷','Photos'],['📄','Files: orbit-brief.pdf'],['🗒','Canvas']].map(o=>`<button class="opt ${o[0]==='📄'?'hot':''}" type="button" data-act="${o[0]==='📄'?'pick':'toast:Not in demo'}"><b>${o[0]}</b>${o[1]}</button>`).join('')}</div></div>`:''}`;
+}
+function iosCreate(){
+  const k=STEPS[st.i].k;const n=fmt(st.name);const taken=TAKEN.includes(n);
+  if(k==='c2'){
+    const can=n&&!taken;
+    return `${sbar()}<div class="mnav"><button type="button" data-act="cancel" aria-label="Close">✕</button><b>${V==='new'?'Create channel':'New channel'}</b><button class="act ${can?'hot':''}" type="button" data-act="next2" ${can?'':'disabled'}>Next</button></div>
+     <div class="mbody">${V==='new'?'<div class="steps3"><span class="on">1 Name</span><span>2 Who can see</span><span>3 People</span></div>':''}
+     <label for="cname"><b>Name</b></label><div class="fld"># <input id="cname" maxlength="80" placeholder="${V==='new'?'e.g. proj-orbit':'e.g. plan-budget'}" value="${st.name}" autocomplete="off"></div>
+     ${taken?`<span class="err">That name is already taken.</span>`:V==='new'?`<span class="hint" id="nprev">${n?'Shows as <b>#'+n+'</b> · '+n.length+'/80':'Lowercase, no spaces. We convert it for you.'}</span>`:''}
+     ${V==='new'?`<label for="cpur"><b>What’s it for?</b> <span class="hint">optional</span></label><div class="fld"><input id="cpur" placeholder="e.g. Plan and ship Project Orbit" value="${st.purpose}"></div>`:''}</div>`;
+  }
+  if(k==='c3'){
+    if(V==='cur') return `${sbar()}<div class="mnav"><button type="button" data-act="back2" aria-label="Back">‹</button><b>New channel</b><button class="act hot" type="button" data-act="createnow">Create</button></div>
+     <div class="mbody"><b>Visibility</b>
+     <div class="radio ${st.vis!=='private'?'on':''}" data-act="vis:public"><i></i><div><b>Public</b><br><span class="hint">Anyone in Acme Studio</span></div></div>
+     <div class="radio ${st.vis==='private'?'on':''}" data-act="vis:private"><i></i><div><b>Private</b><br><span class="hint">Only specific people</span></div></div></div>`;
+    return `${sbar()}<div class="mnav"><button type="button" data-act="back2" aria-label="Back">‹</button><b>Who can see it?</b><button class="act ${st.vis?'hot':''}" type="button" data-act="createnow" ${st.vis?'':'disabled'}>Next</button></div>
+     <div class="mbody"><div class="steps3"><span class="done">1 ✓</span><span class="on">2 Who can see</span><span>3 People</span></div>
+     ${[['public','#','Public',['124 people in Acme can see and join','Shows in everyone’s search']],['private','🔒','Private',['Only people you add','Hidden from search for others']]].map(o=>`<button class="vcard ${st.vis===o[0]?'on':''}" type="button" data-act="vis:${o[0]}" aria-pressed="${st.vis===o[0]}"><span class="ico">${o[1]}</span><span><b>${o[2]}</b><ul>${o[3].map(x=>`<li>${x}</li>`).join('')}</ul></span><span class="rd"></span></button>`).join('')}</div>`;
+  }
+  if(k==='c4'){
+    return `${sbar()}<div class="mnav"><button type="button" data-act="skip">${V==='new'?'Later':'Skip'}</button><b>Add people</b><button class="act ${st.members.length?'hot':''}" type="button" data-act="done" ${V==='cur'&&!st.members.length?'disabled':''}>${V==='new'?'Create':'Add'}</button></div>
+     <div class="mbody">${V==='new'?'<div class="steps3"><span class="done">1 ✓</span><span class="done">2 ✓</span><span class="on">3 People</span></div><span class="hint">Suggested</span>':''}
+     ${V==='new'?`<div class="chips">${['pn','ad','mi','ks'].map(k2=>`<button class="chip ${st.members.includes(k2)?'on':''}" type="button" data-act="tog:${k2}">${av(k2,22,11)}${PEOPLE[k2][0].split(' ')[0]} ${st.members.includes(k2)?'✓':'＋'}</button>`).join('')}</div>`:''}
+     <div class="fld"><input id="pin" placeholder="Search names" autocomplete="off"></div>
+     ${V==='cur'?`<div class="chips">${st.members.map(k2=>`<span class="chip on">${av(k2,22,11)}${PEOPLE[k2][0]}</span>`).join('')}</div><span class="hint">Type “Priya” or “Arjun” and press return.</span>`:''}</div>`;
+  }
+  // c5
+  const nn=n||'proj-orbit';const lock=st.vis==='private'?'🔒':'#';const mem=st.members.length+1;
+  return `${sbar()}<div class="mnav"><button type="button" data-act="toast:Back to Home">‹</button><b>${lock} ${nn}</b><span class="hint">${mem} 👤</span></div>
+   ${V==='new'?summary():''}<div class="intro"><h4 style="font:900 20px var(--body);margin:0">${lock} ${nn}</h4><p style="margin:0">${V==='new'&&st.purpose?st.purpose:'This is the very beginning of '+lock+' '+nn+'.'}</p>${V==='cur'?`<div class="acts"><button class="ob" type="button">Add description</button><button class="ob" type="button" data-act="addpeople">Add people</button></div>`:''}</div><div style="flex:1"></div><div class="mcomp"><span style="flex:1;color:#888;padding-left:8px">Message ${lock} ${nn}</span></div>`;
+}
+function ios(){
+  const k=STEPS[st.i].k;
+  if(k==='open') return phone(`<div class="splash"><div style="text-align:center;display:flex;flex-direction:column;gap:14px"><span class="logo" style="color:#fff;font-size:30px">${logo.replace('slack</span>','slack</span>')}</span><button class="big hot" style="background:#fff;color:#4A154B" type="button" data-act="next">Get started</button></div></div>`,1);
+  if(k==='signin') return phone(`${sbar()}<form class="mbody" data-form="email" style="justify-content:center">${logo}<h4 style="font:900 26px var(--body);margin:0;text-align:center">Sign in to Slack</h4><div class="fld"><input id="em" type="email" placeholder="name@work-email.com" value="${st.email}" aria-label="Email"></div><button class="big hot" type="submit">Continue with email</button><button class="sso" type="button" data-act="sso">Continue with Google</button><button class="sso" type="button" data-act="sso">Continue with Apple</button></form>`);
+  if(k==='code') return phone(`${sbar()}<div class="mbody" style="justify-content:center;text-align:center">${logo}<h4 style="font:900 24px var(--body);margin:0">Check your email</h4><p class="hint">Code sent to ${st.email||'rohan@acme.example'}</p><div class="otp">${'XK492B'.split('').map(c=>`<span style="width:40px;height:52px">${c}</span>`).join('')}</div><div class="wsrow"><span class="ws2">A</span><div style="flex:1"><b>Acme Studio</b><br><span class="hint">124 members</span></div><button class="mb hot" type="button" data-act="next">Open</button></div></div>`);
+  if(k==='invite') return phone(`${sbar()}<div class="mnav"><button type="button" data-act="next">✕</button><b>Invite people</b><button class="act ${st.invited?'':'hot'}" type="button" data-act="sendinv">Send</button></div><div class="mbody"><label for="iv"><b>Email</b></label><div class="fld"><input id="iv" type="email" placeholder="name@gmail.com" value="${st.invited}"></div>${st.invited?`<span class="hint" style="color:#007A5A;font-weight:700">✓ Invitation sent (demo)</span>`:''}<button class="ob" type="button" data-act="toast:Invite link copied (demo)">🔗 Share invite link</button><span class="hint">Slack Connect invitations (to people at other companies) live under You → Invitations to connect.</span></div>`);
+  if(['home','c1'].includes(k)) return phone(iosHome());
+  if(['dm','file','collab'].includes(k)) return phone(iosConv());
+  return phone(iosCreate());
+}
+/* ---------- render ---------- */
+let toastT;
+function toast(m){const w=stage.querySelector('.win,.mob');if(!w)return;w.querySelectorAll('.toast').forEach(x=>x.remove());const d=document.createElement('div');d.className='toast';d.textContent=m;w.appendChild(d);clearTimeout(toastT);toastT=setTimeout(()=>d.remove(),2300)}
+function render(){
+  const s=STEPS[st.i];const g=G[s.k];
+  stage.innerHTML=P==='ios'?ios():desk();
+  $('stepk').textContent=`${s.sec} · step ${st.i+1} of ${STEPS.length}${s.core?' · evaluated flow':''}`;
+  $('stept').textContent=s.t;
+  const src=s.core?(V==='new'?'pro':'rec'):g.src;
+  const sb=$('srcb');sb.className='badge '+src;sb.textContent=src==='pro'?'PROPOSED CONCEPT':src==='obs'?'BASED ON REAL SCREENSHOTS':'RECREATED · VERIFY WITH YOUR OWN SCREENSHOT';
+  $('gtry').innerHTML=g.try;
+  $('gobs').innerHTML=g.obs.map(x=>`<li>${x}</li>`).join('');
+  $('gfixh').textContent=s.core?(V==='new'?'What changed (proposed)':'Proposed fix'):'Design notes';
+  $('gfix').innerHTML=g.fix.map(x=>`<li>${x}</li>`).join('')+(g.h?`<li><b>Principles:</b> ${g.h.join(' · ')}</li>`:'');
+  $('prev').disabled=st.i===0;$('next').textContent=st.i===STEPS.length-1?'Start again ↺':'Next →';
+  let last='';$('rail').innerHTML=STEPS.map((x,n)=>{let h='';if(x.sec!==last){h+=`<span class="sec">${x.sec}</span>`;last=x.sec}return h+`<button type="button" class="${x.core?'core':''}" data-go="${n}" ${n===st.i?'aria-current="step"':''}><i>${n+1}</i><span>${x.t}</span></button>`}).join('');
+  const ci=stage.querySelector('#cname');if(ci){ci.focus();ci.setSelectionRange(ci.value.length,ci.value.length)}
+}
+function goto(n){st.i=Math.max(0,Math.min(STEPS.length-1,n));st.menu=false;st.sheet=false;st.sheetAdd=false;st.picker=false;
+  const k=STEPS[st.i].k;
+  if(['c2','c3','c4','c5'].includes(k)&&!st.name&&k!=='c2')st.name='Project Orbit';
+  if(['c4','c5'].includes(k)&&!st.vis)st.vis=V==='cur'?'public':'private';
+  if(k==='c5')st.created=true;
+  if(['dm','file','collab'].includes(k))st.threadOpen=k==='collab'?st.threadOpen:false;
+  render();}
+function step(k){goto(STEPS.findIndex(x=>x.k===k))}
+stage.addEventListener('input',e=>{
+  if(e.target.id==='cname'){st.name=e.target.value;const n=fmt(st.name);const taken=TAKEN.includes(n);
+    const btn=stage.querySelector('[data-act="next2"]');if(btn){btn.disabled=!(n&&!taken);btn.classList.toggle('hot',!!(n&&!taken))}
+    const pv=stage.querySelector('#nprev');if(pv){pv.className=taken?'err':'hint';pv.innerHTML=taken?'#'+n+' already exists. Try another name.':n?'It will appear as <b>#'+n+'</b> · '+n.length+'/80':'Lowercase, no spaces. We convert it for you.'}
+    const er=stage.querySelector('.err');if(V==='cur'&&(taken!==!!er))render();}
+  if(e.target.id==='cpur')st.purpose=e.target.value;
+  if(e.target.id==='cin')st.typed=e.target.value;
+  if(e.target.id==='em')st.email=e.target.value;
+  if(e.target.id==='iv')st.invited_t=e.target.value;
+});
+stage.addEventListener('keydown',e=>{
+  if(e.target.id==='pin'&&e.key==='Enter'){e.preventDefault();const q=e.target.value.toLowerCase();const k=Object.keys(PEOPLE).find(x=>PEOPLE[x][0].toLowerCase().startsWith(q)&&q);if(k&&!st.members.includes(k)){st.members.push(k);render();stage.querySelector('#pin')?.focus()}else toast('No match. Try “Priya” or “Arjun”.')}
+  if(e.target.id==='cname'&&e.key==='Enter'){e.preventDefault();stage.querySelector('[data-act="next2"]:not([disabled])')?.click()}
+});
+stage.addEventListener('submit',e=>{e.preventDefault();const f=e.target.dataset.form;
+  if(f==='email'){if(!/^\S+@\S+\.\S+$/.test(st.email)){st.email='rohan@acme.example'}step('code');return}
+  if(f==='send'){const t=(st.typed||'').trim()||'Sure, sending it in a minute.';st.msgs.push({w:'me',t,tm:'now'});st.typed='';render();toast('Message sent');return}
+  if(f==='invite'){st.invited=st.invited_t||'zoya@example.com';render();toast('Invitation sent (demo)');return}
+});
+PEOPLE.me=['Rohan Mehra','#2EB67D','RM'];
+stage.addEventListener('click',e=>{
+  const el=e.target.closest('[data-act]');if(!el)return;
+  const [a,v]=el.dataset.act.split(/:(.*)/s);
+  if(a==='nosheet'&&e.target!==el)return;
+  if(a==='next'){goto(st.i+1);return}
+  if(a==='prev'){goto(st.i-1);return}
+  if(a==='toast'){toast(v);return}
+  if(a==='sso'){toast('Single sign-on opens in your browser (not in demo)');return}
+  if(a==='attach'){st.picker=true;render();return}
+  if(a==='nopick'){st.picker=false;render();return}
+  if(a==='pick'){st.picker=false;st.file=true;st.msgs.push({w:'me',t:'Here is the brief 👇',tm:'now',file:1});render();toast('orbit-brief.pdf shared');return}
+  if(a==='opendm'){step('dm');return}
+  if(a==='thread'){st.threadOpen=!st.threadOpen;render();return}
+  if(a==='reply'){st.reply=true;st.threadOpen=true;render();toast('Reply posted in thread');return}
+  if(a==='huddle'){st.huddle=!st.huddle;render();toast(st.huddle?'Huddle started with Priya':'You left the huddle');return}
+  if(a==='sendinv'){st.invited=st.invited_t||'zoya@example.com';render();toast('Invitation sent (demo)');return}
+  if(a==='openmenu'){st.menu=st.menu?false:v;if(STEPS[st.i].k!=='c1')st.i=STEPS.findIndex(x=>x.k==='c1');render();return}
+  if(a==='sheet'){st.sheet=true;if(STEPS[st.i].k!=='c1')st.i=8;render();return}
+  if(a==='sheetadd'){st.sheetAdd=true;st.i=8;render();return}
+  if(a==='nosheet'){st.sheet=false;st.sheetAdd=false;render();return}
+  if(a==='create'){st.menu=false;st.sheet=false;st.sheetAdd=false;step('c2');return}
+  if(a==='cancel'){step('c1');toast('Channel not created');return}
+  if(a==='purp'){st.purpose=v;render();return}
+  if(a==='next2'){if(!st.name)return;step('c3');return}
+  if(a==='back2'){step('c2');return}
+  if(a==='vis'){st.vis=v;render();return}
+  if(a==='createnow'){if(V==='new'&&!st.vis)return;if(!st.vis)st.vis='public';if(V==='cur'){st.created=true;}step('c4');if(V==='cur')toast('#'+(fmt(st.name)||'proj-orbit')+' created');return}
+  if(a==='tog'){const i=st.members.indexOf(v);i>=0?st.members.splice(i,1):st.members.push(v);render();return}
+  if(a==='skip'||a==='done'){step('c5');if(V==='new')toast('#'+(fmt(st.name)||'proj-orbit')+' created');return}
+  if(a==='addpeople'){step('c4');return}
+});
+$('rail').addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)goto(+b.dataset.go)});
+$('prev').onclick=()=>goto(st.i-1);
+$('next').onclick=()=>st.i===STEPS.length-1?(st=S0(),render()):goto(st.i+1);
+$('reset').onclick=()=>{st=S0();render()};
+document.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{P=b.dataset.p;document.querySelectorAll('[data-p]').forEach(x=>x.setAttribute('aria-pressed',x===b));st.menu=false;st.sheet=false;render()});
+document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{V=b.dataset.v;document.querySelectorAll('[data-v]').forEach(x=>x.setAttribute('aria-pressed',x===b));const i=st.i;const keep={name:st.name,purpose:st.purpose};st=Object.assign(S0(),{i});if(STEPS[i].core){st.name=keep.name;st.purpose=keep.purpose}goto(i)});
+window.__set=(p,v,i,extra)=>{P=p;V=v;st=Object.assign(S0(),extra||{});document.querySelectorAll('[data-p]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.p===p));document.querySelectorAll('[data-v]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===v));st.i=i;render()};
+const h=(location.hash||'').slice(1);if(['desk','web','ios'].includes(h)){P=h;document.querySelectorAll('[data-p]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.p===h))}
+render();
+})();
+</script>
+
+</body></html>

@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Slack Onboarding Prototypes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: heading, case switch, then phone on the left and an annotation column on the right. */
+:root{--bg:#fbfafc;--panel:#fff;--ink:#1f1a24;--mute:#6b6272;--line:#e3dde7;--plum:#4a1d4d;--tint:#f3eef5;--red:#c8321f;--green:#12805c;--onplum:#fff;--stage:#e9e3ec;
+ --disp:"Bricolage Grotesque","Arial Narrow",sans-serif;--body:"IBM Plex Sans",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17111a;--panel:#211826;--ink:#f0e9f2;--mute:#a99dae;--line:#3a2d40;--plum:#d9a8dd;--tint:#2b2030;--red:#ff7a66;--green:#4cc79b;--onplum:#17111a;--stage:#2a2030;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#17111a;--panel:#211826;--ink:#f0e9f2;--mute:#a99dae;--line:#3a2d40;--plum:#d9a8dd;--tint:#2b2030;--red:#ff7a66;--green:#4cc79b;--onplum:#17111a;--stage:#2a2030;color-scheme:dark}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--ink);font:400 16px/1.5 var(--body);padding:0 max(16px,env(safe-area-inset-left,0px)) 48px}
+.wrap{max-width:1000px;margin:0 auto}
+header{padding-block:36px 18px;display:flex;flex-direction:column;gap:10px}
+.eyebrow{font:600 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--plum)}
+h1{font:800 clamp(30px,5vw,50px)/1.05 var(--disp);letter-spacing:-.02em;text-wrap:balance}
+header p{color:var(--mute);max-width:60ch}
+.cases{display:flex;gap:10px;flex-wrap:wrap;margin-block:6px 22px}
+.cases button{flex:1 1 280px;text-align:left;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:10px;padding:14px 16px;cursor:pointer;font:inherit}
+.cases button b{display:block;font:700 18px var(--disp)}.cases button span{font-size:13.5px;color:var(--mute)}
+.cases button[aria-pressed="true"]{border-color:var(--plum);box-shadow:inset 4px 0 0 var(--plum)}
+button:focus-visible{outline:2px solid var(--plum);outline-offset:2px}
+.stage{display:grid;grid-template-columns:auto minmax(0,1fr);gap:36px;align-items:start}
+.phone{width:370px;height:760px;border-radius:44px;background:#17111a;padding:10px;box-shadow:0 20px 50px rgba(0,0,0,.25);flex:none}
+.screen{width:100%;height:100%;border-radius:34px;background:#fff;color:#1f1a24;overflow:hidden;position:relative;display:flex;flex-direction:column;font-size:14px}
+.sb{display:flex;justify-content:space-between;padding:12px 22px 4px;font:600 12px var(--body)}
+.body{flex:1;overflow:auto;padding:14px 20px;display:flex;flex-direction:column;gap:10px}
+.screen h2{font:800 24px/1.1 var(--disp);letter-spacing:-.01em}
+.screen .sub{color:#6b6272;font-size:13.5px}
+.btn{border:1px solid #d6cddb;background:#fff;color:#1f1a24;border-radius:8px;height:42px;font:500 14px var(--body);cursor:pointer;display:flex;align-items:center;justify-content:center;width:100%}
+.btn.pri{background:#4a1d4d;border-color:#4a1d4d;color:#fff;font-weight:600;height:48px}
+.btn.sm{height:30px;width:auto;padding:0 12px;font-size:12.5px}
+.inp{border:1px solid #d6cddb;border-radius:8px;height:44px;padding:0 12px;display:flex;align-items:center;color:#8f8696;width:100%;font:inherit;background:#fff}
+.inp.v{color:#1f1a24}
+.or{text-align:center;color:#a89fae;font-size:12px}
+.lnk{color:#4a1d4d;text-decoration:underline;font-size:13px;text-align:center;cursor:pointer;background:none;border:0;font-family:inherit}
+.lnk.tiny{font-size:10.5px;color:#a89fae}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.boxes{display:flex;gap:6px;justify-content:center;margin-block:8px}
+.boxes i{width:38px;height:48px;border:1px solid #d6cddb;border-radius:8px;display:flex;align-items:center;justify-content:center;font:700 20px var(--body);font-style:normal}
+.boxes.small i{width:22px;height:30px;border-radius:5px;font-size:12px}
+.boxes i.f{border-color:#4a1d4d;background:#f4ecf5}
+.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:auto}
+.keys button{height:40px;border:0;border-radius:8px;background:#f1edf3;font:600 18px var(--body);cursor:pointer;color:#1f1a24}
+.tabbar{display:flex;border-top:1px solid #e3dde7;padding:6px 4px 14px;background:#fff}
+.tabbar div{flex:1;text-align:center;font-size:10px;color:#6b6272;display:flex;flex-direction:column;align-items:center;gap:3px}
+.tabbar i{width:20px;height:20px;border-radius:6px;background:#d6cddb;display:block}
+.tabbar .a{color:#4a1d4d;font-weight:600}.tabbar .a i{background:#4a1d4d}
+.tabbar.ico div{font-size:0}.tabbar.ico i{width:18px;height:18px}
+.hd{background:#4a1d4d;color:#fff;padding:10px 20px;font:700 17px var(--disp)}
+.list{display:flex;flex-direction:column}
+.list .it{padding:9px 0;border-bottom:1px solid #f0eaf2;display:flex;justify-content:space-between;cursor:pointer}
+.list .it.mut{color:#6b6272;cursor:default}
+.sec{font:600 10.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:#8f8696;margin-top:8px}
+.card{border:1px solid #d6cddb;border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.chk{display:flex;gap:10px;align-items:center;padding:6px 0;font-size:14px}
+.chk i{width:18px;height:18px;border-radius:50%;border:2px solid #12805c;flex:none;display:flex;align-items:center;justify-content:center;font-style:normal;color:#fff;font-size:11px}
+.chk i.d{background:#12805c}
+.chk.go{background:#e8f5ef;border-radius:8px;padding:8px;cursor:pointer;font-weight:600}
+.coach{background:#2a1a2c;color:#fff;border-radius:8px;padding:8px 10px;font-size:12px;position:relative;margin-left:30px}
+.coach:before{content:"";position:absolute;left:14px;top:-6px;border:6px solid transparent;border-top:0;border-bottom-color:#2a1a2c}
+.msg{display:flex;gap:8px}.av{width:30px;height:30px;border-radius:7px;background:#d6cddb;flex:none}
+.msg b{font-size:13px}.msg p{font-size:13.5px}
+.composer{border:1px solid #d6cddb;border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:6px;margin:8px 12px 12px}
+.composer .ic{display:flex;gap:6px;align-items:center}.composer .ic i{width:14px;height:14px;border-radius:3px;background:#d6cddb}
+.composer .ic .send{margin-left:auto;width:22px;height:18px;border-radius:4px;background:#12805c;cursor:pointer}
+.hint{color:#12805c;font-size:12px;font-weight:600}
+.toast{position:absolute;left:14px;right:14px;bottom:130px;background:#2a1a2c;color:#fff;border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.toast button{color:#ffb4a6;background:none;border:0;font:600 13px var(--body);cursor:pointer}
+.dim{position:absolute;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:30px}
+.dlg{background:#fff;border-radius:14px;padding:16px;width:100%;display:flex;flex-direction:column;gap:12px;text-align:center}
+.opt{border:1px solid #d6cddb;border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;flex-direction:column;text-align:left}
+.opt b{font-size:14px}.opt span{font-size:12px;color:#6b6272}
+.opt.on{border-color:#12805c;background:#e8f5ef}
+.pin,.ok{position:absolute;right:8px;width:22px;height:22px;border-radius:50%;color:#fff;font:700 12px/22px var(--mono);text-align:center;box-shadow:0 0 0 2px #fff;z-index:2;pointer-events:none}
+.pin{background:#c8321f}.ok{background:#12805c}
+.rel{position:relative;display:flex;flex-direction:column;gap:10px}
+/* side column */
+.side{display:flex;flex-direction:column;gap:16px;min-width:0}
+.ctl{display:flex;gap:8px;flex-wrap:wrap}
+.ctl button{font:600 14px var(--body);border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:10px 16px;cursor:pointer}
+.ctl button.p{background:var(--plum);color:var(--onplum);border-color:var(--plum)}
+.ctl button:disabled{opacity:.4;cursor:default}
+.step{font:600 12px var(--mono);letter-spacing:.08em;color:var(--mute);text-transform:uppercase}
+.side h2{font:800 28px/1.1 var(--disp);letter-spacing:-.01em;text-wrap:balance}
+.hintline{color:var(--mute);font-size:14px}
+.note{border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:14px;display:flex;gap:12px;align-items:flex-start}
+.note .b{width:24px;height:24px;border-radius:50%;color:#fff;font:700 12px/24px var(--mono);text-align:center;flex:none}
+.note.cur .b{background:var(--red)}.note.new .b{background:var(--green)}
+.note b.t{display:block;font-weight:600}.note small{display:block;color:var(--mute);font-size:13px;margin-top:2px}
+.note ul{margin:6px 0 0 18px;font-size:13.5px}
+.dots{display:flex;gap:6px}.dots i{width:22px;height:4px;border-radius:2px;background:var(--line)}.dots i.on{background:var(--plum)}
+.foot{margin-top:30px;color:var(--mute);font-size:13px;max-width:70ch}
+.back{font:600 13px var(--body);color:var(--plum);text-decoration:none}
+@media (max-width:860px){.stage{grid-template-columns:1fr;justify-items:center}.side{width:100%}}
+@media (max-width:420px){.phone{width:100%;max-width:370px;height:720px}}
+</style></head>
+<body><div class="wrap">
+<header><a class="back" href="index.html">← Back to the audit</a><div class="eyebrow">Concept prototypes · Slack mobile onboarding</div>
+<h1>Priya's first message, in her first session.</h1>
+<p>Tap inside the phone like a real app, or use the buttons. Case A is today's flow with the problems pinned. Case B is the redesign.</p></header>
+<div class="cases" role="group" aria-label="Case">
+<button id="cA" aria-pressed="true"><b>Case A · Current flow</b><span>Priya joins her team's Slack. Red pins mark usability issues.</span></button>
+<button id="cB" aria-pressed="false"><b>Case B · Redesigned flow</b><span>Same goal. Green ticks mark the fixes.</span></button></div>
+<div class="stage"><div class="phone"><div class="screen" id="screen"></div></div>
+<div class="side"><div class="dots" id="dots"></div><div class="step" id="step"></div><h2 id="ttl"></h2><p class="hintline" id="hint"></p><div id="notes" style="display:flex;flex-direction:column;gap:10px"></div>
+<div class="ctl"><button id="back">Back</button><button id="next" class="p">Next screen</button><button id="restart">Restart</button></div></div></div>
+<p class="foot">These are concept designs for a UX assignment, not affiliated with or endorsed by Slack. Names, team sizes and messages are sample data. Screens are redrawn illustrations of the current experience and may differ from the live app.</p>
+</div>
+<script src="data.js"></script>
+<script>
+const D = DATA, $ = (s) => document.querySelector(s), I = (n) => D.issues[n - 1];
+const sb = `<div class="sb"><span>9:41</span><span>5G ▮▮▮</span></div>`;
+const pin = (n, t) => `<b class="pin" style="top:${t}px">${n}</b>`, ok = (n, t) => `<b class="ok" style="top:${t}px">✓</b>`;
+const tabs = (labels) => `<div class="tabbar ${labels ? "" : "ico"}">${["Home", labels ? "Messages" : "DMs", "Activity", labels ? "Saved" : "Later", "More"].map((t, i) => `<div class="${i === 0 ? "a" : ""}"><i></i>${t}</div>`).join("")}</div>`;
+let K = "A", idx = 0, code = "", msgSent = false, undoT = null, undoLeft = 0, resendT = null, resendLeft = 30, preset = 0;
+
+const S = {
+  A: [
+    { t: "Sign in to Slack", hint: "Six options at the same weight. Tap Sign in with email.", issues: [1, 3],
+      r: () => `${sb}<div class="body"><h2 style="text-align:center;margin-top:30px">Sign in to Slack</h2><div class="rel"><button class="btn" data-go="1">Continue with Google</button><button class="btn" data-go="1">Continue with Apple</button><button class="btn" data-go="1">Sign in with SSO</button>${pin(1, 56)}</div><div class="or">OR</div><div class="inp">name@work-email.com</div><button class="btn" data-go="1">Sign in with email</button><div class="rel"><div class="row"><button class="lnk" data-go="2">Create a new workspace</button><button class="lnk" data-go="2">Find my workspace</button></div>${pin(3, 0)}</div></div>` },
+    { t: "Check your email", hint: "Priya must leave the app to find a code. Tap the boxes to enter it.", issues: [2],
+      r: () => `${sb}<div class="body"><h2 style="margin-top:30px;text-align:center">Check your email</h2><p class="sub" style="text-align:center">We sent a 6-digit code</p><div class="rel"><div class="boxes" data-go="2"><i></i><i></i><i></i><i></i><i></i><i></i></div>${pin(2, 6)}</div><button class="lnk tiny">Didn't get a code?</button></div>` },
+    { t: "Find your workspace", hint: "Asks for a workspace URL. Priya only knows her company name.", issues: [3],
+      r: () => `${sb}<div class="body"><h2 style="margin-top:20px">Find your workspace</h2><p class="sub">Enter your workspace's Slack URL.</p><div class="rel"><div class="inp">your-workspace.slack.com</div>${pin(3, 10)}</div><button class="btn pri" data-go="3">Continue</button><button class="lnk">Create a new workspace instead</button></div>` },
+    { t: "Land in the workspace", hint: "Dense navigation, empty main area. Tap # general.", issues: [5, 6],
+      r: () => `${sb}<div class="hd">Acme</div><div class="body"><div class="rel"><div class="list"><div class="it mut">Threads</div><div class="it mut">Huddles</div><div class="it mut">Drafts &amp; sent</div><div class="it mut">Files</div><div class="it mut">More</div></div>${pin(5, 0)}</div><div class="sec">Channels</div><div class="list"><div class="it" data-go="4"># general</div><div class="it" data-go="4"># random</div></div><div class="sec">Direct messages</div><div class="sec">Apps</div></div><div class="rel">${tabs(false)}${pin(6, -8)}</div>` },
+    { t: "Write the first message", hint: "Small icons beside Send. Nothing says who will see this. Tap Send.", issues: [7],
+      r: () => `${sb}<div class="hd"># general</div><div class="body"><div class="msg"><div class="av"></div><div><b>Slackbot</b><p>Welcome to #general.</p></div></div></div><div class="rel"><div class="composer"><div class="inp v" style="height:34px;border:0;padding:0">Hi everyone!</div><div class="ic"><i></i><i></i><i></i><i></i><i></i><span class="send" data-go="5"></span></div></div>${pin(7, 4)}</div>` },
+    { t: "Notifications, asked cold", hint: "The system prompt appears before Priya knows what she will be notified about.", issues: [8],
+      r: () => `${sb}<div class="body"><div class="msg"><div class="av"></div><div><b>Priya</b><p>Hi everyone!</p></div></div></div><div class="dim"><div class="dlg"><b>"Slack" Would Like to Send You Notifications</b><span class="sub">Notifications may include alerts, sounds and icon badges.</span><div class="row"><button class="btn" data-go="6">Don't Allow</button><button class="btn" data-go="6">Allow</button></div>${pin(8, 8)}</div></div>` },
+    { t: "End of the current flow", hint: "Six screens, with several choices before a first action.", issues: [], end: true,
+      r: () => `${sb}<div class="body" style="justify-content:center;text-align:center;gap:14px"><h2>That is today's flow</h2><p class="sub">Now see the same journey with the fixes applied.</p><button class="btn pri" data-case="B">Open Case B</button><button class="btn" data-go="restart">Replay Case A</button></div>` }
+  ],
+  B: [
+    { t: "Welcome, one email field", hint: "One primary path. Social sign-in is secondary.", issues: [1],
+      r: () => `${sb}<div class="body"><h2 style="margin-top:30px;text-align:center">Welcome to Slack</h2><p class="sub" style="text-align:center">Enter your work email</p><div class="rel"><div class="inp v">priya@acme.com</div>${ok(1, 11)}</div><button class="btn pri" data-go="1">Continue</button><div class="or">or continue with</div><div class="row"><button class="btn">Google</button><button class="btn">Apple</button><button class="btn">SSO</button></div><button class="lnk">New here? Create a workspace</button></div>` },
+    { t: "Enter your code", hint: "Type any six digits on the keypad. It submits by itself.", issues: [2], code: true,
+      r: () => `${sb}<div class="body"><h2 style="margin-top:20px;text-align:center">Enter your code</h2><div class="rel"><p class="sub" style="text-align:center">Sent to p***@acme.com · <button class="lnk" style="font-size:13px">Edit</button></p>${ok(2, 0)}</div><div class="boxes">${[0, 1, 2, 3, 4, 5].map(i => `<i class="${code.length === i ? "f" : ""}">${code[i] || ""}</i>`).join("")}</div><p class="sub" style="text-align:center" id="exp">Expires in 10:00 · <span id="rs">Resend in 0:${String(resendLeft).padStart(2, "0")}</span></p><button class="btn" data-act="mail">Open mail app</button><div class="keys">${"123456789".split("").map(k => `<button data-k="${k}">${k}</button>`).join("")}<span></span><button data-k="0">0</button><button data-k="x">⌫</button></div></div>` },
+    { t: "Your teams, listed", hint: "No workspace URL. Slack finds the team from the email. Tap Join.", issues: [3],
+      r: () => `${sb}<div class="body"><h2 style="margin-top:20px">Your teams</h2><p class="sub">We found 1 team for priya@acme.com</p><div class="rel"><div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><div><b>Acme Design</b><div class="sub">48 members</div></div><button class="btn pri sm" data-go="3">Join</button></div></div>${ok(3, 20)}</div><button class="lnk">Not your team? Create a workspace</button></div>` },
+    { t: "Notifications, with presets", hint: "A soft ask with a recommended default. Pick one, then Continue.", issues: [8],
+      r: () => `${sb}<div class="body"><h2 style="margin-top:20px">Stay in the loop</h2><p class="sub">You can change this any time in Settings.</p><div class="rel">${["Mentions &amp; direct messages|Recommended", "Everything|Every new message", "Nothing|Check manually"].map((o, i) => `<div class="opt ${preset === i ? "on" : ""}" data-p="${i}"><b>${o.split("|")[0]}</b><span>${o.split("|")[1]}</span></div>`).join("")}${ok(8, 4)}</div><button class="btn pri" data-go="4" style="margin-top:auto">Continue</button></div>` },
+    { t: "Land with a first action", hint: "A three-step checklist and a coach mark. Tap Say hello.", issues: [4, 5, 6],
+      r: () => `${sb}<div class="hd">Acme Design</div><div class="body"><div class="rel"><div class="card"><b>Get started · 1 of 3</b><div class="chk"><i class="d">✓</i>Join your team</div><div class="chk go" data-go="5"><i></i>Say hello in #general</div><div class="chk"><i></i>Invite a teammate</div></div>${ok(5, 10)}</div><div class="coach">Start here: say hello to your team</div><div class="sec">Channels</div><div class="list"><div class="it" data-go="5"># general</div><div class="it"># random</div></div></div><div class="rel">${tabs(true)}${ok(6, -8)}</div>` },
+    { t: "Say hello, with a safety net", hint: "Type a message, then Send. You get a ten-second Undo.", issues: [7], composer: true,
+      r: () => `${sb}<div class="hd"># general</div><div class="body"><div class="msg"><div class="av"></div><div><b>Slackbot</b><p>Welcome to #general.</p></div></div>${msgSent ? `<div class="msg"><div class="av"></div><div><b>Priya</b><p>Hi everyone, happy to be here!</p></div></div>` : ""}</div>${undoLeft > 0 ? `<div class="toast"><span>Message sent</span><button data-act="undo">Undo (${undoLeft}s)</button></div>` : ""}<div class="rel"><div class="composer"><div class="hint">Posting to #general · 240 people</div><div class="inp v" style="height:34px;border:0;padding:0">Hi everyone, happy to be here!</div><div class="ic"><i></i><i></i><button class="btn pri sm" style="margin-left:auto;width:70px;height:34px" data-act="send">Send</button></div></div>${ok(7, 4)}</div>` },
+    { t: "First message sent", hint: "Activated, with a clear audience and a way back.", issues: [], end: true,
+      r: () => `${sb}<div class="body" style="justify-content:center;text-align:center;gap:14px"><h2>You're in.</h2><p class="sub">Your first message is live. Checklist: 2 of 3 done.</p><button class="btn pri" data-case="A">Compare with Case A</button><button class="btn" data-go="restart">Replay Case B</button></div>` }
+  ]
+};
+
+function stopTimers() { clearInterval(undoT); clearInterval(resendT); }
+function render() {
+  const list = S[K], s = list[idx];
+  $("#screen").innerHTML = s.r();
+  $("#cA").setAttribute("aria-pressed", K === "A"); $("#cB").setAttribute("aria-pressed", K === "B");
+  $("#dots").innerHTML = list.map((_, i) => `<i class="${i <= idx ? "on" : ""}"></i>`).join("");
+  $("#step").textContent = `Case ${K} · Screen ${idx + 1} of ${list.length}`;
+  $("#ttl").textContent = s.t; $("#hint").textContent = s.hint;
+  $("#notes").innerHTML = s.issues.map(n => { const i = I(n); return K === "A"
+    ? `<div class="note cur"><span class="b">${n}</span><div><b class="t">${i.title}</b><small>${i.h[0]} · ${i.law}</small></div></div>`
+    : `<div class="note new"><span class="b">✓</span><div><b class="t">Fixes issue ${n}: ${i.title}</b><ul>${i.fix.slice(0, 2).map(f => `<li>${f}</li>`).join("")}</ul></div></div>`; }).join("");
+  $("#back").disabled = idx === 0; $("#next").disabled = idx === list.length - 1 || !!s.composer && !msgSent;
+}
+function go(i) { if (i === "restart") { reset(K); return; } idx = Math.max(0, Math.min(S[K].length - 1, i)); onEnter(); render(); }
+function onEnter() {
+  stopTimers();
+  if (K === "B" && idx === 1) { code = ""; resendLeft = 30; resendT = setInterval(() => { if (resendLeft > 0) resendLeft--; const r = document.getElementById("rs"); if (r) r.textContent = resendLeft > 0 ? `Resend in 0:${String(resendLeft).padStart(2, "0")}` : "Resend code"; }, 1000); }
+  if (K === "B" && idx === 5) { msgSent = false; undoLeft = 0; }
+}
+function reset(k) { K = k; idx = 0; code = ""; msgSent = false; undoLeft = 0; preset = 0; stopTimers(); render(); }
+$("#screen").addEventListener("click", (e) => {
+  const t = e.target.closest("[data-go],[data-k],[data-act],[data-p],[data-case]"); if (!t) return;
+  if (t.dataset.case) return reset(t.dataset.case);
+  if (t.dataset.p) { preset = +t.dataset.p; return render(); }
+  if (t.dataset.k) { const k = t.dataset.k; if (k === "x") code = code.slice(0, -1); else if (code.length < 6) code += k; render(); if (code.length === 6) setTimeout(() => { if (K === "B" && idx === 1 && code.length === 6) go(2); }, 500); return; }
+  if (t.dataset.act === "send") { if (undoLeft > 0 || msgSent) return; msgSent = true; undoLeft = 10; clearInterval(undoT); undoT = setInterval(() => { undoLeft--; if (undoLeft <= 0) clearInterval(undoT); render(); }, 1000); render(); return; }
+  if (t.dataset.act === "undo") { clearInterval(undoT); undoLeft = 0; msgSent = false; return render(); }
+  if (t.dataset.act === "mail") { t.textContent = "Opening mail app… (demo)"; return; }
+  if (t.dataset.go !== undefined) { const g = t.dataset.go; go(g === "restart" ? g : +g); }
+});
+$("#next").onclick = () => go(idx + 1);
+$("#back").onclick = () => go(idx - 1);
+$("#restart").onclick = () => reset(K);
+$("#cA").onclick = () => reset("A"); $("#cB").onclick = () => reset("B");
+reset("A");
+</script></body></html>
