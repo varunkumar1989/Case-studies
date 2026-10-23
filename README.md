@@ -5,7 +5,7 @@ Product and UX case studies by Varun Kumar. Independent educational work, not af
 | Study | Folder | Claude artifact |
 |---|---|---|
 | OYO: owner and guest journeys | [`OYO`](./OYO) (10-page deck, 23-page report, prototype) | [Open](https://claude.ai/artifact/X16m61bmq12RqtwcoXgvqB) · [Netlify](https://oyo-varun-v3.netlify.app/#p1) |
-| Zomato: customer and partner flows (final) | final package with prototype, 10-slide deck and 19-page report is in the [Resume repo](https://github.com/varunkumar1989/Resume/tree/claude/serene-dijkstra-0rpgsz/resume-site/case-studies/zomato) | [Open](https://claude.ai/artifact/NL8yiaHhdPBHo8Gx5SPfBL) · [Netlify](https://zomato-varun.netlify.app/) |
+| Zomato: customer and partner flows (final) | final package with prototype, 10-slide deck and 19-page report is in the [Resume repo](https://github.com/varunkumar1989/Deployed-Assignment-and-Resume/tree/main/resume-site/case-studies/zomato) | [Open](https://claude.ai/artifact/NL8yiaHhdPBHo8Gx5SPfBL) · [Netlify](https://zomato-varun.netlify.app/) |
 | Zomato: earlier concept prototype and decks | [`Zomato`](./Zomato) | [Open](https://claude.ai/artifact/GQAmKHgKsu1PChwp24CcMY) |
 | Noon UAE: first-time buyer | [`Noon`](./Noon) (16-page PDF) | [Open](https://claude.ai/artifact/WnJNSE1AYzAQHhnBinYGzt) |
 | Klook: speedboat booking | [`Klook`](./Klook) (8-slide PDF) | [Open](https://claude.ai/artifact/NgvkYSWfS4hdnmYe1kjYhf) |
@@ -16,4 +16,4 @@ Product and UX case studies by Varun Kumar. Independent educational work, not af
 | Zepto: increasing AOV | [`Zepto-AOV`](./Zepto-AOV) (5, 10 and 16-slide decks) | [Open](https://claude.ai/artifact/6CNpU7TGwwWinWqd9R2RmL) |
 | Product Management Master Handbook | [pm-master-handbook repo](https://github.com/varunkumar1989/pm-master-handbook) (12 modules, libraries, 444-page PDF) | [Live site](https://pm-master-handbook-varun.netlify.app) |
 
-Resume and full portfolio: [artifact](https://claude.ai/artifact/LSjCZrSgrP9G5gLKr24vPw) · [Resume repository](https://github.com/varunkumar1989/Resume) · [resume site](https://final-varun-resume.netlify.app) · [`Resume` folder](./Resume)
+Resume and full portfolio: [artifact](https://claude.ai/artifact/LSjCZrSgrP9G5gLKr24vPw) · [Resume repository](https://github.com/varunkumar1989/Deployed-Assignment-and-Resume) · [resume site](https://final-varun-resume.netlify.app) · [`Resume` folder](./Resume)
