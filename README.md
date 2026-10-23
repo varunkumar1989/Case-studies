@@ -14,5 +14,6 @@ Product and UX case studies by Varun Kumar. Independent educational work, not af
 | SkillOS: B2B SaaS product strategy | [`SkillOS`](./SkillOS) (5-page strategy, 15-page deck) | [Open](https://claude.ai/artifact/SctuM4AvyfXhhDxD2apubX) |
 | Uber: Find My Ride | [`Uber`](./Uber) (5-page case study) | [Open](https://claude.ai/artifact/P3Z2SHTh8hFqwXZc7NhwgF) |
 | Zepto: increasing AOV | [`Zepto-AOV`](./Zepto-AOV) (5, 10 and 16-slide decks) | [Open](https://claude.ai/artifact/6CNpU7TGwwWinWqd9R2RmL) |
+| Product Management Master Handbook | [pm-master-handbook repo](https://github.com/varunkumar1989/pm-master-handbook) (12 modules, libraries, 444-page PDF) | [Live site](https://pm-master-handbook-varun.netlify.app) |
 
 Resume and full portfolio: [artifact](https://claude.ai/artifact/LSjCZrSgrP9G5gLKr24vPw) · [Resume repository](https://github.com/varunkumar1989/Resume) · [resume site](https://final-varun-resume.netlify.app) · [`Resume` folder](./Resume)
