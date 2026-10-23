@@ -1,0 +1,156 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Slack Onboarding UX Audit</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="wire.css">
+<style>
+/* Layout: sticky tab bar, then one panel at a time; issue explorer is a list beside a detail card with before/after wireframes. */
+:root{--bg:#fbfafc;--panel:#ffffff;--ink:#1f1a24;--mute:#6b6272;--line:#e3dde7;--plum:#4a1d4d;--tint:#f3eef5;--red:#c8321f;--green:#12805c;--onplum:#ffffff;
+ --hi:#fbe3df;--hit:#8f2012;--me:#fdf0d5;--met:#7a5200;--lo:#e1f1ea;--lot:#0c5c42;--stage:#e9e3ec;
+ --disp:"Bricolage Grotesque","Arial Narrow",sans-serif;--body:"IBM Plex Sans",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17111a;--panel:#211826;--ink:#f0e9f2;--mute:#a99dae;--line:#3a2d40;--plum:#d9a8dd;--tint:#2b2030;--red:#ff7a66;--green:#4cc79b;--onplum:#17111a;
+ --hi:#4a211b;--hit:#ffb4a6;--me:#4a3912;--met:#f1cf85;--lo:#143a2c;--lot:#8fe0bf;--stage:#2a2030;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#17111a;--panel:#211826;--ink:#f0e9f2;--mute:#a99dae;--line:#3a2d40;--plum:#d9a8dd;--tint:#2b2030;--red:#ff7a66;--green:#4cc79b;--onplum:#17111a;
+ --hi:#4a211b;--hit:#ffb4a6;--me:#4a3912;--met:#f1cf85;--lo:#143a2c;--lot:#8fe0bf;--stage:#2a2030;color-scheme:dark}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--ink);font:400 16px/1.55 var(--body);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+.wrap{max-width:1080px;margin:0 auto}
+h1,h2,h3{font-family:var(--disp);letter-spacing:-.015em;text-wrap:balance;line-height:1.1}
+.eyebrow{font:600 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--plum)}
+header.hero{padding-block:40px 20px;display:flex;flex-direction:column;gap:12px}
+header.hero h1{font-size:clamp(34px,6vw,60px);font-weight:800}
+header.hero p{max-width:60ch;color:var(--mute);font-size:18px}
+nav{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;border-bottom:1px solid var(--line);display:flex;gap:4px;overflow-x:auto;padding-block:8px}
+nav button{font:600 14px var(--body);color:var(--mute);background:none;border:0;border-radius:6px;padding:9px 14px;cursor:pointer;white-space:nowrap}
+nav .tablink{font:600 14px var(--body);color:var(--plum);text-decoration:none;border:1px solid var(--plum);border-radius:6px;padding:8px 14px;white-space:nowrap;margin-left:auto}nav button[aria-selected="true"]{background:var(--plum);color:var(--onplum)}
+button:focus-visible{outline:2px solid var(--plum);outline-offset:2px}
+.panel{padding-top:28px;display:flex;flex-direction:column;gap:28px}
+.panel[hidden]{display:none}
+h2{font-size:clamp(24px,3.4vw,34px);font-weight:800}
+.chip{display:inline-block;font:600 11px/1 var(--mono);letter-spacing:.06em;padding:5px 8px;border-radius:4px;background:var(--tint);color:var(--plum);text-transform:uppercase}
+.sev-High{background:var(--hi);color:var(--hit)}.sev-Medium{background:var(--me);color:var(--met)}.sev-Low{background:var(--lo);color:var(--lot)}
+.pinb{display:inline-flex;width:24px;height:24px;border-radius:50%;background:var(--red);color:#fff;font:700 13px var(--mono);align-items:center;justify-content:center;flex:none}
+.flow{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+.fs{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:8px;text-align:left;font:inherit;color:inherit;cursor:pointer}
+.fs:hover{border-color:var(--plum)}
+.fs .no{font:700 11px var(--mono);color:var(--plum)}.fs b{font:700 16px/1.2 var(--disp)}.fs span.g{font-size:13px;color:var(--mute);line-height:1.35}
+.fs .pl{display:flex;gap:4px;margin-top:auto;min-height:24px}
+.stats{display:flex;gap:28px;flex-wrap:wrap;align-items:baseline}
+.stats div{display:flex;flex-direction:column}.stats b{font:800 40px var(--disp)}.stats span{font-size:13px;color:var(--mute)}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.cols2>*{min-width:0}
+.card{border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:10px}
+ul.plain{margin-left:18px;display:flex;flex-direction:column;gap:6px}
+/* explorer */
+.filters{display:flex;gap:8px;flex-wrap:wrap}
+.filters button{font:600 13px var(--body);border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer}
+.filters button[aria-pressed="true"]{background:var(--plum);color:var(--onplum);border-color:var(--plum)}
+.explore{display:grid;grid-template-columns:340px minmax(0,1fr);gap:22px;align-items:start}
+.list{display:flex;flex-direction:column;gap:6px}
+.list button{display:flex;gap:10px;align-items:flex-start;text-align:left;font:500 14.5px/1.3 var(--body);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:11px;cursor:pointer}
+.list button[aria-selected="true"]{border-color:var(--plum);box-shadow:inset 3px 0 0 var(--plum)}
+.list button small{display:block;color:var(--mute);font:500 11px var(--mono);margin-top:4px}
+.detail{display:flex;flex-direction:column;gap:16px}
+.detail h3{font-size:26px;font-weight:800}
+.stage{background:var(--stage);border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:12px;align-items:center;overflow-x:auto}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{font:600 13px var(--body);padding:8px 16px;border:0;background:var(--panel);color:var(--mute);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--plum);color:var(--onplum)}
+.stage .wfw{zoom:1.35}
+dl.kv{display:grid;grid-template-columns:1fr 1fr;gap:6px 24px}
+dl.kv>div{min-width:0}
+dt{font:600 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mute);margin-bottom:3px}
+dd{margin-bottom:10px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+/* redesign */
+.shots{display:flex;flex-wrap:wrap;gap:18px}
+.shot{display:flex;flex-direction:column;gap:6px;background:var(--stage);padding:14px;border-radius:10px}
+.shot small{font:600 11px var(--mono);color:var(--mute);letter-spacing:.04em;text-transform:uppercase}
+.mrow{display:flex;gap:12px;align-items:baseline;border-bottom:1px solid var(--line);padding:9px 0}
+.mrow b{font-weight:600}.mrow span{color:var(--mute);font-size:14px;flex:1}.mrow i{font:600 11px var(--mono);font-style:normal;color:var(--green)}
+.road{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.road .card b{font:700 18px var(--disp)}
+.road .pinb{background:var(--plum);color:var(--onplum);width:20px;height:20px;font-size:11px}
+/* script */
+.seg-s{display:grid;grid-template-columns:150px minmax(0,1fr);gap:18px;border-top:1px solid var(--line);padding-block:18px}
+.seg-s time{font:600 13px var(--mono);color:var(--plum)}.seg-s small{display:block;color:var(--mute);font-size:13px;margin-top:4px}
+.seg-s p{max-width:68ch}
+.copy{font:600 13px var(--body);border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:6px;padding:8px 14px;cursor:pointer;align-self:flex-start}
+.law-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:860px){.flow{grid-template-columns:repeat(2,minmax(0,1fr))}.explore{grid-template-columns:1fr}.cols2,.road,.law-grid{grid-template-columns:1fr}.seg-s{grid-template-columns:1fr;gap:6px}dl.kv{grid-template-columns:1fr}.stage .wfw{zoom:1}}
+@media (prefers-reduced-motion:no-preference){.panel{animation:in .25s ease}@keyframes in{from{opacity:.4}to{opacity:1}}}
+</style>
+<div class="wrap">
+<header class="hero"><div class="eyebrow">UX evaluation · Slack · Web + Mobile · B2B</div>
+<h1>From sign-up to first message</h1>
+<p>Eight usability issues in Slack's onboarding flow, mapped to Nielsen's heuristics and UX laws, with a redesign for each.</p></header>
+<nav role="tablist" aria-label="Sections">
+<button role="tab" id="t-overview" aria-selected="true" data-tab="overview">Overview</button>
+<button role="tab" id="t-issues" aria-selected="false" data-tab="issues">Issues</button>
+<button role="tab" id="t-laws" aria-selected="false" data-tab="laws">UX laws</button>
+<button role="tab" id="t-redesign" aria-selected="false" data-tab="redesign">Redesign</button>
+<a class="tablink" href="prototype.html">Mobile prototype</a></nav>
+
+<section class="panel" id="p-overview" role="tabpanel"></section>
+<section class="panel" id="p-issues" role="tabpanel" hidden></section>
+<section class="panel" id="p-laws" role="tabpanel" hidden></section>
+<section class="panel" id="p-redesign" role="tabpanel" hidden></section>
+
+</div>
+<script src="data.js"></script><script src="wire.js"></script>
+<script>
+const D = DATA, $ = (s) => document.querySelector(s);
+const sev = (s) => `<span class="chip sev-${s}">${s}</span>`;
+const P = (n) => `<span class="pinb">${n}</span>`;
+let sel = 1, view = "cur", filter = "All";
+
+// Overview
+$("#p-overview").innerHTML = `
+ <div class="stats"><div><b>8</b><span>issues found</span></div><div><b>3</b><span>High severity</span></div><div><b>10/10</b><span>heuristics touched</span></div><div><b>4</b><span>UX laws mapped</span></div></div>
+ <div><h2>The flow, in six steps</h2><p style="color:var(--mute);margin:8px 0 16px">Select a step to see its issues.</p>
+ <div class="flow">${D.flow.map(f => `<button class="fs" data-step="${f.n}"><span class="no">STEP ${f.n}</span><b>${f.t}</b><span class="g">${f.g}</span><span class="pl">${D.issues.filter(i => i.step === f.n).map(i => P(i.n)).join("")}</span><span class="chip" style="align-self:flex-start">${f.p}</span></button>`).join("")}</div></div>
+ <div class="cols2"><div class="card"><h3>Why this flow</h3><p>Sign-up to first message is the activation moment. In B2B, one stalled person slows a whole team's rollout, and each failed sign-up becomes a support request for an admin.</p></div>
+ <div class="card"><h3>What stands out</h3><ul class="plain"><li>Too many equal choices at the start</li><li>Waits with no feedback, like the email code</li><li>An arrival screen with no obvious first action</li></ul></div></div>
+ <div class="card"><h3>Try it on a phone</h3><p>Tap through the current and redesigned mobile flows in the <a href="prototype.html" style="color:var(--plum);font-weight:600">interactive prototype</a>.</p></div>\n <div class="card"><h3>About the screens</h3><p style="color:var(--mute)">Screens are annotated wireframes that recreate the current Slack layouts so every issue has a visible pin. Slack changes its interface often, so confirm each observation against the live product.</p></div>`;
+document.querySelectorAll("[data-step]").forEach(b => b.onclick = () => { const i = D.issues.find(x => x.step === +b.dataset.step); if (i) { sel = i.n; view = "cur"; filter = "All"; renderIssues(); go("issues"); } });
+
+// Issues
+function renderIssues() {
+  const laws = ["All", ...D.laws.map(l => l.name)];
+  const list = D.issues.filter(i => filter === "All" || i.law === filter);
+  if (!list.find(i => i.n === sel)) sel = list[0].n;
+  const i = D.issues.find(x => x.n === sel);
+  $("#p-issues").innerHTML = `<h2>Issue explorer</h2>
+  <div class="filters" role="group" aria-label="Filter by UX law">${laws.map(l => `<button aria-pressed="${l === filter}" data-f="${l}">${l}</button>`).join("")}</div>
+  <div class="explore"><div class="list">${list.map(x => `<button aria-selected="${x.n === sel}" data-i="${x.n}">${P(x.n)}<span>${x.title}<small>${x.plat} · ${x.sev.toUpperCase()}</small></span></button>`).join("")}</div>
+  <div class="detail"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">${sev(i.sev)}<span class="chip">${i.plat}</span><span class="chip">Step ${i.step}</span></div>
+   <h3>${i.title}</h3>
+   <div class="stage"><div class="seg" role="group" aria-label="Version"><button aria-pressed="${view === "cur"}" data-v="cur">Current</button><button aria-pressed="${view === "new"}" data-v="new">Redesign</button></div><div class="wfw">${WF(i.screen, view)}</div></div>
+   <dl class="kv"><div><dt>What happens</dt><dd>${i.what}</dd><dt>Impact on users</dt><dd>${i.impact}</dd></div>
+   <div><dt>Heuristics violated</dt><dd class="chips">${i.h.map(h => `<span class="chip">${h}</span>`).join("")}</dd><dt>UX law · ${i.law}</dt><dd>${i.lawWhy}</dd></div></dl>
+   <div class="card"><dt>How to improve</dt><ul class="plain">${i.fix.map(f => `<li>${f}</li>`).join("")}</ul><dt style="margin-top:8px">How to measure</dt><div>${i.metric}</div></div></div></div>`;
+  document.querySelectorAll("[data-f]").forEach(b => b.onclick = () => { filter = b.dataset.f; renderIssues(); });
+  document.querySelectorAll("[data-i]").forEach(b => b.onclick = () => { sel = +b.dataset.i; view = "cur"; renderIssues(); });
+  document.querySelectorAll("[data-v]").forEach(b => b.onclick = () => { view = b.dataset.v; renderIssues(); });
+}
+renderIssues();
+
+// Laws
+$("#p-laws").innerHTML = `<h2>Four laws explain why these hurt</h2><div class="law-grid">${D.laws.map(l => `<div class="card"><h3>${l.name}</h3><p style="color:var(--mute)">${l.rule}</p><dl><dt>In Slack</dt><dd>${l.slack}</dd><dt>Fix</dt><dd>${l.fix}</dd></dl><div style="display:flex;gap:4px">${l.issues.map(P).join("")}</div></div>`).join("")}</div>
+ <div class="card"><h3>Heuristics coverage</h3><div class="chips">${D.heuristics.map(h => `<span class="chip">${h}</span>`).join("")}</div><p style="color:var(--mute)">Every Nielsen heuristic appears at least once across the eight issues.</p></div>`;
+
+// Redesign
+$("#p-redesign").innerHTML = `<h2>The redesigned flow</h2>
+ <div class="chips" style="font-size:14px">${["Email first", "Code with feedback", "Your teams listed", "3-step wizard", "First-run checklist", "Message with undo"].map(s => `<span class="chip" style="background:var(--lo);color:var(--lot)">${s}</span>`).join("")}</div>
+ <div class="shots">${["signin", "code", "wizard", "home", "composer", "notif"].map(s => `<div class="shot"><div class="wfw" style="zoom:1.1">${WF(s, "new")}</div><small>${WF_LABEL(s)} · ${WF_PLAT(s)}</small></div>`).join("")}</div>
+ <div class="cols2"><div><h3 style="margin-bottom:8px">How we will know it worked</h3>${D.metrics.map(m => `<div class="mrow"><b>${m[0]}</b><span>${m[1]}</span><i>${m[2].toUpperCase()}</i></div>`).join("")}</div>
+ <div><h3 style="margin-bottom:8px">What to build first</h3><div class="road" style="grid-template-columns:1fr">${D.roadmap.map(r => `<div class="card"><b>${r[0]}</b><span style="color:var(--mute);font-size:14px">${r[1]}</span><div style="display:flex;gap:4px">${r[2].map(P).join("")}</div></div>`).join("")}</div></div></div>`;
+
+// Tabs
+function go(t) { document.querySelectorAll("[data-tab]").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === t)); document.querySelectorAll(".panel").forEach(p => p.hidden = p.id !== "p-" + t); try { history.replaceState(null, "", "#" + t); } catch (e) {} window.scrollTo(0, 0); }
+document.querySelectorAll("[data-tab]").forEach(b => b.onclick = () => go(b.dataset.tab));
+const h = location.hash.slice(1); if (["overview", "issues", "laws", "redesign"].includes(h)) go(h);
+</script>
+
+</body></html>
